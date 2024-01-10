@@ -54,3 +54,9 @@ dkms.conf
 *.c~
 
 *.h~
+
+build/
+
+src/.#listechainee_main.c
+
+src/#listechainee_main.c#

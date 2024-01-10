@@ -8,5 +8,5 @@ project(ListeChainee
 )
 
 # Add executables of projects
-add_executable(listechainee listchainee_main.c)
-add_library(list list.c)
+add_executable(listechainee src/listechainee_main.c)
+add_library(list list/list.c)

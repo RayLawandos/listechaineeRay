@@ -4,23 +4,24 @@
  * Operation de base de manipulation d'une liste chainee
  */
 
+#include <stdlib.h>
 #include "list.h"
 
-/* Extern decl of current listchainee */
-extern listchainee_ptr curlist;
+/* Extern decl of current listechainee */
+extern listechainee_ptr curlist;
 
 void
-free_list(listchainee_ptr list)
+free_list(listechainee_ptr list)
 {
   while(curlist)
     {
-      listchainee_ptr tmp = curlist;
+      listechainee_ptr tmp = curlist;
       curlist = curlist->next;
       free(tmp);
     }
 }
 
-listchainee_ptr
+listechainee_ptr
 init_list(void)
 {
   if (curlist != NULL)
@@ -28,13 +29,13 @@ init_list(void)
   curlist = NULL;
 }
 
-listchainee_ptr
-reinit_list(listchainee_ptr list)
+listechainee_ptr
+reinit_list(listechainee_ptr list)
 {
   
 }
 
-listchainee_ptr
+listechainee_ptr
 load_list(char* filename)
 {
   
@@ -47,9 +48,9 @@ save_list(char* filename)
 }
 
 int
-test_elem_in_list(listchainee_ptr list, int n)
+test_elem_in_list(listechainee_ptr list, int n)
 {
-  listchainee_ptr tmp = list;
+  listechainee_ptr tmp = list;
   if (tmp == NULL)
     return 0;
   while(tmp)
@@ -62,10 +63,10 @@ test_elem_in_list(listchainee_ptr list, int n)
 }
 
 int
-test_ix_in_list(listchainee_ptr list, int ix)
+test_ix_in_list(listechainee_ptr list, int ix)
 {
   int lix = 0;
-  listchainee_ptr tmp = list;
+  listechainee_ptr tmp = list;
   if (tmp == NULL)
     return 0;
   while(tmp)
@@ -79,29 +80,29 @@ test_ix_in_list(listchainee_ptr list, int ix)
 }
 
 void
-append_list(listchainee_ptr list, int n)
+append_list(listechainee_ptr list, int n)
 {
   
 }
 
 void
-prepend_list(listchainee_ptr list, int n)
+prepend_list(listechainee_ptr list, int n)
 {
   
 }
 
-listchainee_ptr
-insert_elem_in_list(listchainee_ptr list, int ix, int n)
+listechainee_ptr
+insert_elem_in_list(listechainee_ptr list, int ix, int n)
 {
   if (test_ix_in_list(list, ix))
     {
       int lix = 0;
-      listchainee_ptr tmp = list;
+      listechainee_ptr tmp = list;
       while(tmp)
         {
           if (lix == ix)
             {
-              listchainee_ptr newn = (listchainee_ptr)malloc(sizeof(struct listchainee_st));
+              listechainee_ptr newn = (listechainee_ptr)malloc(sizeof(struct listechainee_st));
               if (newn == NULL)
                 return NULL;
               newn->N = n;
@@ -126,19 +127,19 @@ insert_elem_in_list(listchainee_ptr list, int ix, int n)
 }
 
 void
-delete_end_of_list(listchainee_ptr list)
+delete_end_of_list(listechainee_ptr list)
 {
   
 }
 
-listchainee_ptr
-delete_start_of_list(listchainee_ptr list)
+listechainee_ptr
+delete_start_of_list(listechainee_ptr list)
 {
   
 } 
 
-listchainee_ptr
-delete_elem_in_list(listchainee_ptr list, int ix)
+listechainee_ptr
+delete_elem_in_list(listechainee_ptr list, int ix)
 {
   
 }
