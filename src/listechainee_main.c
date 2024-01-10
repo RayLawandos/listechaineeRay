@@ -1,5 +1,5 @@
 /*
- * listchainee_main.c
+ * listechainee_main.c
  *
  * Fichier source principale du menu de gestion de liste chainee
  * Affiche le menu, saisie la commande a executer puis lance la commande
@@ -9,13 +9,13 @@
 #include <unistd.h>
 #include <getopt.h>
 
-#include "list.h"
+#include "list/list.h"
 
 /* Forward decl main */
 int main(int argc, char** argv);
 
 /* List chainee courante */
-listchaine_ptr curlist = (listchainee_ptr)NULL;
+listechaine_ptr curlist = (listechainee_ptr)NULL;
 
 extern char* optarg;
 static int d_opt = 0;
