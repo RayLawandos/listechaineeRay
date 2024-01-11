@@ -6,6 +6,7 @@
  */
 
 #include <stdio.h>
+#include <strings.h>
 #include <unistd.h>
 #include <getopt.h>
 
@@ -18,15 +19,30 @@ int main(int argc, char** argv);
 listechainee_ptr curlist = (listechainee_ptr)NULL;
 
 extern char* optarg;
+static int v_opt = 0;
+static int h_opt = 0;
 static int d_opt = 0;
 static int i_opt = 0; 
-static int l_opt = 0; 
+static int l_opt = 0;
+static int s_opt = 0;
+static int t_opt = 0;
+static int A_opt = 0;
+static int P_opt = 0;
+static int I_opt = 0;
+static int x_opt = 0;
+static int X_opt = 0;
+static int r_opt = 0;
+static int q_opt = 0;
+static int N_opt = 0;
+char *progname = (char *)NULL;
 char* arg_filename;
 
 int main(int argc, char** argv)
 {
   int c;
   int digit_optind = 0;
+
+  progname = (progname = rindex(argv[0], '/')) ? argv[0] : progname+1;
   
   while (1) {
     int this_option_optind = optind ? optind : 1;
@@ -35,11 +51,17 @@ int main(int argc, char** argv)
       {"help",    no_argument,       0,  'h'},
       {"verbose", no_argument,       0,  'v'},
       {"display", no_argument,       0,  'd'},
-      {"append",  no_argument,       0,  0 },
-      {"delete",  required_argument, 0,  0 },
-      {"verbose", no_argument,       0,  0 },
-      {"create",  required_argument, 0, 'c'},
-      {"file",    required_argument, 0,  0 },
+      {"load",    required_argument, 0,  'l' },
+      {"save",    required_argument, 0,  's' },
+      {"test",    required_argument, 0,  't' },
+      {"append",  no_argument,       0,  'A'},
+      {"prepend", no_argument,       0,  'P' },
+      {"insert",  required_argument, 0,  'I' },
+      {"del",     no_argument,       0,  'x' },
+      {"delend",  no_argument,       0,  'X' },
+      {"remove",  required_argument, 0,  'r' },
+      {"quit",    no_argument,       0,  'q' },
+      {"inter",   no_argument,       0,  'N' },
       {0,         0,                 0,  0 }
     };
     
@@ -49,35 +71,16 @@ int main(int argc, char** argv)
       break;
                
     switch (c) {
-    case 0:
-      printf("option %s", long_options[option_index].name);
-      if (optarg)
-        printf(" with arg %s", optarg);
-      printf("\n");
-      break;
-
-    case '0':
-    case '1':
-    case '2':
-      if (digit_optind != 0 && digit_optind != this_option_optind)
-        printf("digits occur in two different argv-elements.\n");
-      digit_optind = this_option_optind;
-      printf("option %c\n", c);
-      break;
-
     case 'd':
       d_opt = 1;
-      
+      if (v_opt)
+        fprintf(stdout, "%s: Info: option 'd' was set !\n", progname);
       break;
 
-    case 'l':
-      l_opt = 1;
-      arg_filename = optarg;
-      printf("option b\n");
+    case 'i':
       break;
 
     case 'c':
-      printf("option c with value '%s'\n", optarg);
       break;
 
     case 'h':

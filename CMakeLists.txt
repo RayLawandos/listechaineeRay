@@ -8,12 +8,11 @@ project(ListeChainee
 )
 
 # Add executables of projects
+add_library(list list/list.c)
 add_executable(listechainee src/listechainee_main.c)
 include_directories(BEFORE "${PROJECT_SOURCE_DIR}")
-add_library(list list/list.c)
+target_link_libraries(listechainee list)
 add_executable(testlistechainee tests/test-main.c tests/list-tests.c)
-set_target_properties(testlistechainee
-  PROPERTIES LD_FLAGS "-llist -lcunit"
-)
+target_link_libraries(testlistechainee list -lcunit)
 add_test(testlistechainee testlistechainee)
 

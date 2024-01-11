@@ -7,7 +7,11 @@
 #include <stdio.h>
 #include <CUnit/Basic.h>
 
+#include "list/list.h"
 #include "list-tests.h"
+
+/* List chainee courante */
+listechainee_ptr curlist = (listechainee_ptr)NULL;
 
 /*
  * Forward decl for our functions

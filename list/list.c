@@ -13,10 +13,10 @@ extern listechainee_ptr curlist;
 void
 free_list(listechainee_ptr list)
 {
-  while(curlist)
+  while(list)
     {
-      listechainee_ptr tmp = curlist;
-      curlist = curlist->next;
+      listechainee_ptr tmp = list;
+      list = list->next;
       free(tmp);
     }
 }
