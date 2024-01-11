@@ -5,7 +5,7 @@
  */
 
 #include <stdlib.h>
-#include "list.h"
+#include "list/list.h"
 
 /* Extern decl of current listechainee */
 extern listechainee_ptr curlist;

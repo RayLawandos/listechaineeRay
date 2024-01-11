@@ -5,7 +5,8 @@
  * These tests pre-condition, post-conditions and functional 
  */
 
-#include "list.h"
+#include <stdlib.h>
+#include "list/list.h"
 #include <CUnit/Basic.h>
 
 void
@@ -20,7 +21,7 @@ test_ix_in_list_with_list_null(void)
 void
 test_ix_in_list_with_list_with_ix(void)
 {
-  listchainee_ptr list = (listchainee_ptr)malloc(sizeof(struct listechainee_st));
+  listechainee_ptr list = (listechainee_ptr)malloc(sizeof(struct listechainee_st));
   list->N = 1;
   list->next = NULL;
   CU_ASSERT(test_ix_in_list(list, 0) == 1);
@@ -29,7 +30,7 @@ test_ix_in_list_with_list_with_ix(void)
 void
 test_ix_in_list_with_list_without_ix(void)
 {
-  listchainee_ptr list = (listchainee_ptr)malloc(sizeof(struct listechainee_st));
+  listechainee_ptr list = (listechainee_ptr)malloc(sizeof(struct listechainee_st));
   list->N = 1;
   list->next = NULL;
   CU_ASSERT(test_ix_in_list(list, 1) == 0);  

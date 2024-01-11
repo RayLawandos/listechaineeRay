@@ -15,11 +15,12 @@
 int main(int argc, char** argv);
 
 /* List chainee courante */
-listechaine_ptr curlist = (listechainee_ptr)NULL;
+listechainee_ptr curlist = (listechainee_ptr)NULL;
 
 extern char* optarg;
 static int d_opt = 0;
 static int i_opt = 0; 
+static int l_opt = 0; 
 char* arg_filename;
 
 int main(int argc, char** argv)
@@ -79,7 +80,7 @@ int main(int argc, char** argv)
       printf("option c with value '%s'\n", optarg);
       break;
 
-    case 'd':
+    case 'h':
       printf("option d with value '%s'\n", optarg);
       break;
 
