@@ -4,6 +4,7 @@
  * Operation de base de manipulation d'une liste chainee
  */
 
+#include <stdio.h>
 #include <stdlib.h>
 #include "list/list.h"
 
@@ -21,12 +22,31 @@ free_list(listechainee_ptr list)
     }
 }
 
-listechainee_ptr
+void
 init_list(void)
 {
   if (curlist != NULL)
     free_list(curlist);
   curlist = NULL;
+}
+
+void
+display_list(listechainee_ptr list)
+{
+  if (list == NULL)
+    fprintf(stdout, "Liste vide\n");
+  else
+    {
+      fprintf(stdout, "Liste: ");
+      while(list)
+        {
+          fprintf(stdout, "%d", list->N);
+          if (list->next)
+            fprintf(stdout, ",");
+          list = list->next;
+        }
+      fprintf(stdout, "\n");
+    }
 }
 
 listechainee_ptr
@@ -79,16 +99,45 @@ test_ix_in_list(listechainee_ptr list, int ix)
   return 0;
 }
 
-void
+listechainee_ptr
 append_list(listechainee_ptr list, int n)
 {
+  if (test_elem_in_list(list, n))
+    return NULL;
   
+  listechainee_ptr new_node = (listechainee_ptr)malloc(sizeof(struct listechainee_st));
+  new_node->N = n;
+  new_node->next = (listechainee_ptr)NULL;
+  if (list == NULL)
+    {
+      list = new_node;
+    }
+  else
+    {
+      listechainee_ptr tmp = list;
+      while(tmp)
+        {
+          if (tmp->next == NULL)
+            break;
+          tmp = tmp->next;
+        }
+      tmp->next = new_node;
+    }
+  return list;  
 }
 
-void
+listechainee_ptr 
 prepend_list(listechainee_ptr list, int n)
 {
+  if (test_elem_in_list(list, n))
+    return NULL;
   
+  listechainee_ptr new_node = (listechainee_ptr)malloc(sizeof(struct listechainee_st));
+  new_node->N = n;
+  new_node->next = list;
+  list = new_node;
+
+  return list;
 }
 
 listechainee_ptr
