@@ -26,6 +26,7 @@ int clean_suite1(void);
  */
 int init_suite1(void)
 {
+  return 0;
 }
 
 /* The suite cleanup function.
@@ -34,6 +35,7 @@ int init_suite1(void)
  */
 int clean_suite1(void)
 {
+  return 0;
 }
 
 int
