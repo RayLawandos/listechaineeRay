@@ -60,3 +60,9 @@ build/
 src/.#listechainee_main.c
 
 src/#listechainee_main.c#
+
+*.txt#
+
+.#CMakeLists.txt
+
+.vscode/
