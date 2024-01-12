@@ -11,6 +11,15 @@
 /* Extern decl of current listechainee */
 extern listechainee_ptr curlist;
 
+/*
+ * free_list
+ *
+ * Take a list as input and free all nodes in it
+ * params:
+ *   list - in: list to free
+ * returns:
+ *   void
+ */
 void
 free_list(listechainee_ptr list)
 {
@@ -22,6 +31,16 @@ free_list(listechainee_ptr list)
     }
 }
 
+/*
+ * init_list
+ *
+ * Initialize the current list as a NULL list. If curlist
+ * is not null, free it.
+ * params:
+ *   void
+ * returns:
+ *   void
+ */
 void
 init_list(void)
 {
@@ -30,6 +49,16 @@ init_list(void)
   curlist = NULL;
 }
 
+/*
+ * display_list
+ *
+ * Take a list as input and displays all nodes in it. If list
+ * is null, displays "Empty list".
+ * params:
+ *   list - in: the list to display
+ * returns:
+ *   void
+ */
 void
 display_list(listechainee_ptr list)
 {
@@ -67,6 +96,18 @@ save_list(char* filename)
   
 }
 
+/*
+ * test_elem_in_list
+ *
+ * Take a list and an elem as input, and returns if this elem is
+ * contained in this list.
+ * params:
+ *   list - in: the list in which to test if elem is in
+ *   n    - in: the element to test
+ * returns:
+ *   0: if elem is not in the list
+ *   1: if elem is in the list
+ */
 int
 test_elem_in_list(listechainee_ptr list, int n)
 {
@@ -82,13 +123,23 @@ test_elem_in_list(listechainee_ptr list, int n)
   return 0;
 }
 
+/*
+ * test_ix_in_list
+ *
+ * Take a list and an index as input, and returns if this index is
+ * contained in this list (number of elem in list > ix).
+ * params:
+ *   list - in: the list in which to test if elem is in
+ *   ix   - in: the element to test
+ * returns:
+ *   0: if ix is not in the list
+ *   1: if ix is in the list or ix == 0 & list is NULL
+ */
 int
 test_ix_in_list(listechainee_ptr list, int ix)
 {
   int lix = 0;
   listechainee_ptr tmp = list;
-  if (tmp == NULL)
-    return 0;
   while(tmp)
     {
       if (lix == ix)
@@ -96,9 +147,20 @@ test_ix_in_list(listechainee_ptr list, int ix)
       tmp = tmp->next;
       lix++;
     }
-  return 0;
+  return ix == 0 ? 1 : 0;
 }
 
+/*
+ * append_list
+ *
+ * Take a list and element as input and append the element
+ * at the end of the list.
+ * params:
+ *   list - in: list in which to append the new element
+ *   n    - in: element to append to the list
+ * returns:
+ *   the list
+ */
 listechainee_ptr
 append_list(listechainee_ptr list, int n)
 {
@@ -126,6 +188,17 @@ append_list(listechainee_ptr list, int n)
   return list;  
 }
 
+/*
+ * prepend_list
+ *
+ * Take a list and element as input and prepend the element
+ * at the start of the list.
+ * params:
+ *   list - in: list in which to prepend the new element
+ *   n    - in: element to prepend to the list
+ * returns:
+ *   the list
+ */
 listechainee_ptr 
 prepend_list(listechainee_ptr list, int n)
 {
@@ -140,38 +213,70 @@ prepend_list(listechainee_ptr list, int n)
   return list;
 }
 
+/*
+ * insert_elem_in_list
+ *
+ * Take a list, an element and an index as input and insert the element 'n'
+ * in the list 'list' at the index 'ix'. if index is not in list or if
+ * element is already in list, returns NULL.
+ * params:
+ *   list - in: the list in which to insert the element
+ *   ix   - in: the index at which the element has to be inserted
+ *   n    - in: the element to insert in the list at the index
+ * returns:
+ *   the list if the element is not in the list and was inserted
+ *   NULL otherwhise
+ */
 listechainee_ptr
 insert_elem_in_list(listechainee_ptr list, int ix, int n)
 {
-  if (test_ix_in_list(list, ix))
+  /* First test pre conditions: ix in list and elem not in list */
+  if (test_ix_in_list(list, ix) && !test_elem_in_list(list, n))
     {
+      /* local ix */
       int lix = 0;
+      /* tmp node ptr */
       listechainee_ptr tmp = list;
+      /* while tmp not null */
       while(tmp)
         {
+          /* If index was found */
           if (lix == ix)
             {
+              /* Allocate new node */
               listechainee_ptr newn = (listechainee_ptr)malloc(sizeof(struct listechainee_st));
               if (newn == NULL)
+                /* Mem alloc pb */
                 return NULL;
+              /* Init node */
               newn->N = n;
+              /* If index is 0, insert at start of list */
               if (ix == 0)
                 {
+                  /* New node is the new list */
                   newn->next = tmp->next;
+                  /* Then returns it */
                   return newn;
                 }
+              /* Insert in the list (after the first element) */
               else
                 {
+                  /* Link new node to next node */
                   newn->next = tmp->next;
+                  /* Insert new node */
                   tmp->next = newn;
+                  /* Returns list */
                   return list;                  
                 }
             }
+          /* Goes on to next node */
           tmp = tmp->next;
+          /* And incr local ix */
           lix++;
         }      
     }
   else
+    /* returns NULL: cannot insert */
     return(NULL);
 }
 
