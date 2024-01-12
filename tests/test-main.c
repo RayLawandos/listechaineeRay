@@ -8,7 +8,8 @@
 #include <CUnit/Basic.h>
 
 #include "list/list.h"
-#include "list-tests.h"
+#include "list-tests.h"			// Include tests decl for list library
+#include "cmd-tests.h"			// Include tests decl for command line behaviour
 
 /* List chainee courante */
 listechainee_ptr curlist = (listechainee_ptr)NULL;
@@ -17,27 +18,68 @@ listechainee_ptr curlist = (listechainee_ptr)NULL;
  * Forward decl for our functions
  */
 int main(int, char**);
-int init_suite1(void);
-int clean_suite1(void);
+int init_suite_tests4list(void);
+int clean_suite_tests4list(void);
+int init_suite_tests4cmd(void);
+int clean_suite_tests4cmd(void);
+
+
+/*
+ * ==============================================================================
+ *                                            Suite for testing the list library
+ *
+ */
 
 /* The suite initialization function.
- * Opens the temporary file used by the tests.
  * Returns zero on success, non-zero otherwise.
  */
-int init_suite1(void)
+int init_suite_tests4list(void)
 {
   return 0;
 }
 
 /* The suite cleanup function.
- * Closes the temporary file used by the tests.
  * Returns zero on success, non-zero otherwise.
  */
-int clean_suite1(void)
+int clean_suite_tests4list(void)
 {
   return 0;
 }
 
+/*
+ * ==============================================================================
+ *                                        Suite for testing the command behavior
+ *
+ */
+
+/* The suite initialization function.
+ * Returns zero on success, non-zero otherwise.
+ */
+int init_suite_tests4cmd(void)
+{
+  return 0;
+}
+
+/* The suite cleanup function.
+ * Returns zero on success, non-zero otherwise.
+ */
+int clean_suite_tests4cmd(void)
+{
+  return 0;
+}
+
+/*
+ * ==============================================================================
+ *                                                                Main for tests
+ *
+ */
+
+/*
+ * main
+ *
+ * The main function for the tests entry point. It creates tghe tests suites,
+ * provision the tests for each test suite and finally executes all tests.
+ */
 int
 main(int argc, char** argv)
 {
@@ -47,23 +89,43 @@ main(int argc, char** argv)
    if (CUE_SUCCESS != CU_initialize_registry())
       return CU_get_error();
 
-   /* add a suite to the registry */
-   pSuite = CU_add_suite("Suite_1", init_suite1, clean_suite1);
+   /* add a suite for testing the list library to the registry */
+   pSuite = CU_add_suite("Suite_4_list", init_suite_tests4list, clean_suite_tests4list);
    if (NULL == pSuite) {
       CU_cleanup_registry();
       return CU_get_error();
    }
 
    /* add the tests to the suite */
-   /* NOTE - ORDER IS IMPORTANT - MUST TEST fread() AFTER fprintf() */
-   if ((NULL == CU_add_test(pSuite, "test of test_ix_in_list_with_list_null", test_ix_in_list_with_list_null)) ||
-       (NULL == CU_add_test(pSuite, "test of test_ix_in_list_with_list_with_ix", test_ix_in_list_with_list_with_ix)) ||
-       (NULL == CU_add_test(pSuite, "test of test_ix_in_list_with_list_without_ix", test_ix_in_list_with_list_without_ix)))
+   /* 6 tests */
+   if ((NULL == CU_add_test(pSuite, "test of test_ix_in_list with null list", test_ix_in_list_with_list_null)) ||
+       (NULL == CU_add_test(pSuite, "test of test_ix_in_list with list with ix", test_ix_in_list_with_list_with_ix)) ||
+       (NULL == CU_add_test(pSuite, "test of test_ix_in_list with list without ix", test_ix_in_list_with_list_without_ix)) ||
+       (NULL == CU_add_test(pSuite, "test of test_elem_in_list with null list", test_elem_in_list_with_null_list)) ||
+       (NULL == CU_add_test(pSuite, "test of test_elem_in_list with non null list", test_elem_in_list_with_non_null_list1)) ||
+       (NULL == CU_add_test(pSuite, "test of test_elem_in_list with non null list (int limit)", test_elem_in_list_with_non_null_list2)) ||
+       (NULL == CU_add_test(pSuite, "test of test_elem_in_list with non null list (int limit) #2", test_elem_in_list_with_non_null_list3))
+       )
    {
       CU_cleanup_registry();
       return CU_get_error();
    }
 
+   /* add a suite to the registry */
+   /* 1 test */
+   pSuite = CU_add_suite("Suite_4_command", init_suite_tests4cmd, clean_suite_tests4cmd);
+   if (NULL == pSuite) {
+      CU_cleanup_registry();
+      return CU_get_error();
+   }
+
+   /* add the tests for the command to the suite */
+   if ((NULL == CU_add_test(pSuite, "test of basic command launch", test_command_basic_invocation)))
+   {
+      CU_cleanup_registry();
+      return CU_get_error();
+   }
+   
    /* Run all tests using the CUnit Basic interface */
    CU_basic_set_mode(CU_BRM_VERBOSE);
    CU_basic_run_tests();

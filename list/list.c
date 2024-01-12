@@ -138,15 +138,27 @@ test_elem_in_list(listechainee_ptr list, int n)
 int
 test_ix_in_list(listechainee_ptr list, int ix)
 {
-  int lix = 0;
+  /* If ix not positive or null */
+  if (ix < 0)
+    /* returns No */
+    return 0;
+  /* Local index */
+  int lix = 1;
+  /* Temp node ptr */
   listechainee_ptr tmp = list;
+  /* Browse the list */
   while(tmp)
     {
+      /* If index is found */
       if (lix == ix)
+        /* Return Yes */
         return 1;
+      /* Goes on next node */
       tmp = tmp->next;
+      /* Incr local index (next one) */
       lix++;
     }
+  /* If index was null it is always available else return No */
   return ix == 0 ? 1 : 0;
 }
 
