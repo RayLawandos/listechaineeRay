@@ -12,7 +12,7 @@ add_library(list list/list.c)
 add_executable(listechainee src/listechainee_main.c)
 include_directories(BEFORE "${PROJECT_SOURCE_DIR}")
 target_link_libraries(listechainee list)
-add_executable(testlistechainee tests/test-main.c tests/list-tests.c)
+add_executable(testlistechainee tests/test-main.c tests/list-tests.c tests/cmd-tests.c)
 target_link_libraries(testlistechainee list -lcunit)
 add_test(testlistechainee testlistechainee)
 
