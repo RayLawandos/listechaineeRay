@@ -120,7 +120,18 @@ main(int argc, char** argv)
    }
 
    /* add the tests for the command to the suite */
-   if ((NULL == CU_add_test(pSuite, "test of basic command launch", test_command_basic_invocation)))
+   if ((NULL == CU_add_test(pSuite, "test of basic command launch ", test_command_basic_invocation_0)) ||
+       (NULL == CU_add_test(pSuite, "test of basic command launch (-v)", test_command_basic_invocation_v)) ||
+       (NULL == CU_add_test(pSuite, "test of basic command launch (-v -h)", test_command_basic_invocation_vh)) ||
+       (NULL == CU_add_test(pSuite, "test of basic command launch (--verbose)", test_command_basic_invocation_verbose)) ||
+       (NULL == CU_add_test(pSuite, "test of basic command launch (--verbose --help)", test_command_basic_invocation_verbose_help)) ||
+       (NULL == CU_add_test(pSuite, "test of basic command launch (-A 1 -d)", test_command_basic_invocation_A1d)) ||
+       (NULL == CU_add_test(pSuite, "test of basic command launch (-P 2 -d)", test_command_basic_invocation_P2d)) ||
+       (NULL == CU_add_test(pSuite, "test of basic command launch (--append 3 --display)", test_command_basic_invocation_append_3_display)) ||
+       (NULL == CU_add_test(pSuite, "test of basic command launch (--prepend 4 --display)", test_command_basic_invocation_prepend_4_display)) ||
+       (NULL == CU_add_test(pSuite, "test of basic command launch (--append 3 --display)", test_command_basic_invocation_A1P2d)) ||
+       (NULL == CU_add_test(pSuite, "test of basic command launch (--prepend 4 --display)", test_command_basic_invocation_append_1_prepend_2_display))
+       )
    {
       CU_cleanup_registry();
       return CU_get_error();
