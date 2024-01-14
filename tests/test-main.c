@@ -129,8 +129,14 @@ main(int argc, char** argv)
        (NULL == CU_add_test(pSuite, "test of basic command launch (-P 2 -d)", test_command_basic_invocation_P2d)) ||
        (NULL == CU_add_test(pSuite, "test of basic command launch (--append 3 --display)", test_command_basic_invocation_append_3_display)) ||
        (NULL == CU_add_test(pSuite, "test of basic command launch (--prepend 4 --display)", test_command_basic_invocation_prepend_4_display)) ||
-       (NULL == CU_add_test(pSuite, "test of basic command launch (--append 3 --display)", test_command_basic_invocation_A1P2d)) ||
-       (NULL == CU_add_test(pSuite, "test of basic command launch (--prepend 4 --display)", test_command_basic_invocation_append_1_prepend_2_display))
+       (NULL == CU_add_test(pSuite, "test of basic command launch (-A 1 -P 2 -d)", test_command_basic_invocation_A1P2d)) ||
+       (NULL == CU_add_test(pSuite, "test of basic command launch (--append 1 --prepend 2 --display)", test_command_basic_invocation_append_1_prepend_2_display)) ||
+       (NULL == CU_add_test(pSuite, "test of basic command launch (-v -A 1 -d)", test_command_basic_invocation_vA1d)) ||
+       (NULL == CU_add_test(pSuite, "test of basic command launch (-v -P 2 -d)", test_command_basic_invocation_vP2d)) ||
+       (NULL == CU_add_test(pSuite, "test of basic command launch (--verbose --append 3 --display)", test_command_basic_invocation_verbose_append_3_display)) ||
+       (NULL == CU_add_test(pSuite, "test of basic command launch (--verbose --prepend 4 --display)", test_command_basic_invocation_verbose_prepend_4_display)) ||
+       (NULL == CU_add_test(pSuite, "test of basic command launch (-v -A 1 -P 2 -d)", test_command_basic_invocation_vA1P2d)) ||
+       (NULL == CU_add_test(pSuite, "test of basic command launch (--verbose --append 1 --prepend 2 --display)", test_command_basic_invocation_verbose_append_1_prepend_2_display))
        )
    {
       CU_cleanup_registry();

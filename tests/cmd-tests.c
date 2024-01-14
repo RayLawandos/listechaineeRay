@@ -13,7 +13,7 @@
 
 #include "list/list.h"
 
-#define NB_TESTS 12
+#define NB_TESTS 18
 #define BUFFER_MAX_SIZE 10240
 #define DEBUG_COMMAND_STRING "./Debug/listechainee"
 #define RELEASE_COMMAND_STRING "./Release/listechainee"
@@ -60,6 +60,46 @@ char* results[NB_TESTS] = {
   "Liste: 3\n",
   "Liste: 4\n",
   "Liste: 2,1\n",
+  "Liste: 2,1\n",
+  "listechainee: info: option 'v' was incremented for verbosity !\n"
+  "listechainee: info: option 'A' was called for appending '1' !\n"
+  "listechainee: info: appending '1'\n"
+  "listechainee: info: option 'd' was set !\n"
+  "listechainee: info: Displaying list\n"
+  "Liste: 1\n",
+  "listechainee: info: option 'v' was incremented for verbosity !\n"
+  "listechainee: info: option 'P' was called for prepending '2' !\n"
+  "listechainee: info: prepending '2'\n"
+  "listechainee: info: option 'd' was set !\n"
+  "listechainee: info: Displaying list\n"
+  "Liste: 2\n",
+  "listechainee: info: option 'v' was incremented for verbosity !\n"
+  "listechainee: info: option 'A' was called for appending '3' !\n"
+  "listechainee: info: appending '3'\n"
+  "listechainee: info: option 'd' was set !\n"
+  "listechainee: info: Displaying list\n"
+  "Liste: 3\n",
+  "listechainee: info: option 'v' was incremented for verbosity !\n"
+  "listechainee: info: option 'P' was called for prepending '4' !\n"
+  "listechainee: info: prepending '4'\n"
+  "listechainee: info: option 'd' was set !\n"
+  "listechainee: info: Displaying list\n"
+  "Liste: 4\n",
+  "listechainee: info: option 'v' was incremented for verbosity !\n"
+  "listechainee: info: option 'A' was called for appending '1' !\n"
+  "listechainee: info: appending '1'\n"
+  "listechainee: info: option 'P' was called for prepending '2' !\n"
+  "listechainee: info: prepending '2'\n"
+  "listechainee: info: option 'd' was set !\n"
+  "listechainee: info: Displaying list\n"
+  "Liste: 2,1\n",
+  "listechainee: info: option 'v' was incremented for verbosity !\n"
+  "listechainee: info: option 'A' was called for appending '1' !\n"
+  "listechainee: info: appending '1'\n"
+  "listechainee: info: option 'P' was called for prepending '2' !\n"
+  "listechainee: info: prepending '2'\n"
+  "listechainee: info: option 'd' was set !\n"
+  "listechainee: info: Displaying list\n"
   "Liste: 2,1\n",
   NULL
 };
@@ -195,4 +235,70 @@ void
 test_command_basic_invocation_append_1_prepend_2_display(void)
 {
   TEST_COMMAND_ARGS_VS_RESULT_NB("--append 1 --prepend 2 --display", 10);  
+}
+
+/*
+ * test_command_basic_invocation_vA1d
+ *
+ * Basic tests for the command invocation with '-v -A 1 -d' args
+ */
+void
+test_command_basic_invocation_vA1d(void)
+{
+  TEST_COMMAND_ARGS_VS_RESULT_NB("-v -A 1 -d", 11);
+}
+
+/*
+ * test_command_basic_invocation_vP2d
+ *
+ * Basic tests for the command invocation with '-v -P 2 -d' args
+ */
+void
+test_command_basic_invocation_vP2d(void)
+{
+  TEST_COMMAND_ARGS_VS_RESULT_NB("-v -P 2 -d", 12);
+}
+
+/*
+ * test_command_basic_invocation_verbose_append_3_display
+ *
+ * Basic tests for the command invocation with '--verbose --append 3 --display' args
+ */
+void
+test_command_basic_invocation_verbose_append_3_display(void)
+{
+  TEST_COMMAND_ARGS_VS_RESULT_NB("--verbose --append 3 --display", 13);  
+}
+
+/*
+ * test_command_basic_invocation_verbose_prepend_4_display
+ *
+ * Basic tests for the command invocation with '--verbose --prepend 4 --display' args
+ */
+void
+test_command_basic_invocation_verbose_prepend_4_display(void)
+{
+  TEST_COMMAND_ARGS_VS_RESULT_NB("--verbose --prepend 4 --display", 14);  
+}
+
+/*
+ * test_command_basic_invocation_vA1P2d
+ *
+ * Basic tests for the command invocation with '-v -A 1 -P 2 -d' args
+ */
+void
+test_command_basic_invocation_vA1P2d(void)
+{
+  TEST_COMMAND_ARGS_VS_RESULT_NB("-v -A 1 -P 2 -d", 15);  
+}
+
+/*
+ * test_command_basic_invocation_verbose_append_1_prepend_2_display
+ *
+ * Basic tests for the command invocation with '--verbose --append 1 --prepend 2 --display' args
+ */
+void
+test_command_basic_invocation_verbose_append_1_prepend_2_display(void)
+{
+  TEST_COMMAND_ARGS_VS_RESULT_NB("--verbose --append 1 --prepend 2 --display", 16);  
 }
