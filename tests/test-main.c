@@ -98,13 +98,22 @@ main(int argc, char** argv)
 
    /* add the tests to the suite */
    /* 6 tests */
-   if ((NULL == CU_add_test(pSuite, "test of test_ix_in_list with null list", test_ix_in_list_with_list_null)) ||
-       (NULL == CU_add_test(pSuite, "test of test_ix_in_list with list with ix", test_ix_in_list_with_list_with_ix)) ||
-       (NULL == CU_add_test(pSuite, "test of test_ix_in_list with list without ix", test_ix_in_list_with_list_without_ix)) ||
-       (NULL == CU_add_test(pSuite, "test of test_elem_in_list with null list", test_elem_in_list_with_null_list)) ||
-       (NULL == CU_add_test(pSuite, "test of test_elem_in_list with non null list", test_elem_in_list_with_non_null_list1)) ||
-       (NULL == CU_add_test(pSuite, "test of test_elem_in_list with non null list (int limit)", test_elem_in_list_with_non_null_list2)) ||
-       (NULL == CU_add_test(pSuite, "test of test_elem_in_list with non null list (int limit) #2", test_elem_in_list_with_non_null_list3))
+   if ((NULL == CU_add_test(pSuite, "test of test_ix_in_list with null list", 
+                            test_ix_in_list_with_list_null)) ||
+       (NULL == CU_add_test(pSuite, "test of test_ix_in_list with list with ix", 
+                            test_ix_in_list_with_list_with_ix)) ||
+       (NULL == CU_add_test(pSuite, "test of test_ix_in_list with list without ix", 
+                            test_ix_in_list_with_list_without_ix)) ||
+       (NULL == CU_add_test(pSuite, "test of test_elem_in_list with null list", 
+                            test_elem_in_list_with_null_list)) ||
+       (NULL == CU_add_test(pSuite, "test of test_elem_in_list with non null list", 
+                            test_elem_in_list_with_non_null_list1)) ||
+       (NULL == CU_add_test(pSuite, "test of test_elem_in_list with non null list (int limit)", 
+                            test_elem_in_list_with_non_null_list2)) ||
+       (NULL == CU_add_test(pSuite, "test of test_elem_in_list with non null list (int limit) #2", 
+                            test_elem_in_list_with_non_null_list3)) ||
+       (NULL == CU_add_test(pSuite, "test of test_append_list_with_list_null", 
+                            test_append_list_with_list_null))
        )
    {
       CU_cleanup_registry();
