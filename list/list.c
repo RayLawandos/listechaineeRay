@@ -106,58 +106,102 @@ reinit_list(listechainee_ptr list)
 listechainee_ptr
 load_list(char* filename)
 {
+  /* Reinit the current list */
   listechainee_ptr list = reinit_list(curlist);
+  /* Open the file 'filename' for reading */
   FILE *fp = fopen(filename, "r");
+  /* File opening failed */
   if (fp == (FILE*)NULL)
     {
+      /* Format the error message */
       char errmesg[ERR_MESSAGE_MAX_SIZE];
       snprintf(errmesg, ERR_MESSAGE_MAX_SIZE-1, "error: loading list from file '%s'", filename);
+      /* Displays it */
       perror(errmesg);
+      /* Return an error */
       return NULL;
     }
+  /* File opened successfully */
   else
     {
+      /* Buffer for reading the file */
       char s[BUFFER_MAX_SIZE];
+      /* Pointers (start/end) used for parsing integers */
       char* s_ptr = (char*)NULL;
       char* e_ptr = (char*)NULL;
-      while ((s_ptr = fgets(s_ptr, BUFFER_MAX_SIZE-1, fp)) != (char*)NULL)
+      /* While we can read a line from file */
+      while ((s_ptr = fgets(s, BUFFER_MAX_SIZE-1, fp)) != (char*)NULL)
         {
-          int n = (int)strtol(s_ptr, &e_ptr, 10);
-          if (*e_ptr == ',')
-            s_ptr++;
-          list = append_list(list, n);
+          do
+            {
+              /* Parse integer from start and record the end */
+              int n = (int)strtol(s_ptr, &e_ptr, 10);
+              /* If end is a comma ',' */
+              if (*e_ptr == ',')
+                /* For next integer, starts after comma */
+                s_ptr = e_ptr+1;
+              else
+                /* Else start where we stopped */
+                s_ptr = e_ptr;
+              /* Append read integer as a new list element */
+              list = append_list(list, n);
+            }
+          /* While we didn't reach end of line or end of file */
+          while(*s_ptr != '\n' && *s_ptr != EOF);
         }
     }
+  /* Return the new list */
   return list;
 }
 
 /*
+ * save_list
  *
+ * Save a linked list to the file named <filename>.
+ * If saving fails, NULL is returned.
+ * params:
+ *   filename - in: the name of the file to save the list to
+ * returns:
+ *   the saved list if successfull
+ *   NULL otherwise
  */
 listechainee_ptr
 save_list(listechainee_ptr list, char* filename)
 {
+  /* Opens file 'filename' for writing */
   FILE *fp = fopen(filename, "w");
+  /* If file didn't opened successfully */
   if (fp == (FILE *)NULL)
     {
+      /* Format error message */
       char errmesg[ERR_MESSAGE_MAX_SIZE];
       snprintf(errmesg, ERR_MESSAGE_MAX_SIZE-1, "error: loading list from file '%s'", filename);
+      /* And displays it */
       perror(errmesg);
+      /* Returns error */
       return NULL;
     }
+  /* File opened successfully */
   else
     {
+      /* Browse the list */
       listechainee_ptr tmp = list;
       while (tmp)
         {
+          /* Print the current element */
           fprintf(fp, "%d", tmp->N);
+          /* If there is still some elements, add a comma */
           if (tmp->next)
             fprintf(fp, ",");
+          /* Next element */
           tmp = tmp->next;
         }
+      /* At end of list add a new line */
       fprintf(fp, "\n");
+      /* Close the file */
       fclose(fp);
     }
+  /* Return the list */
   return list;
 }
 
@@ -176,15 +220,18 @@ save_list(listechainee_ptr list, char* filename)
 int
 test_elem_in_list(listechainee_ptr list, int n)
 {
+  /* Browse the list */
   listechainee_ptr tmp = list;
-  if (tmp == NULL)
-    return 0;
   while(tmp)
     {
+      /* If element was found */
       if (tmp->N == n)
+        /* Returns success */
         return 1;
+      /* Next element */
       tmp = tmp->next;
     }
+  /* Returns failure */
   return 0;
 }
 
