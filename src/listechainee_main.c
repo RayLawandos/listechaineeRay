@@ -73,25 +73,29 @@ int arg_elem = 0;						// Argument handling element
 void
 print_help(void)
 {
-  fprintf(stdout, "%s: usage: %s [-hvdxXqN] [-l|-s <filename>] [-t|-A|-P|-I|-r <elem>]                                    \n", progname, progname);
-  fprintf(stdout, "%s         Options:                                                                                    \n", blankname);
-  fprintf(stdout, "%s         Options:                                                                                    \n", blankname);
-  fprintf(stdout, "%s            [-h|--help]                  display this help message                                   \n", blankname);
-  fprintf(stdout, "%s            [-v|--verbose]               increase verbosity                                          \n", blankname);
-  fprintf(stdout, "%s         Commands:\n", blankname);
-  fprintf(stdout, "%s            [-l|--load <filename>]       load a linked list from a file <filename>                   \n", blankname);
-  fprintf(stdout, "%s            [-s|--save <filename>]       save a linked list in a file <filename>                     \n", blankname);
-  fprintf(stdout, "%s            [-t|--test <elem>]           test if an element <elem> is contained in the list          \n", blankname);
-  fprintf(stdout, "%s            [-A|--append <elem>]         append the element <elem> in the list                       \n", blankname);
-  fprintf(stdout, "%s            [-P|--prepend <elem>]        prepend the element <elem> in the list                      \n", blankname);
-  fprintf(stdout, "%s            [-I|--insert <elem,[+]pos>]  insert the element <elem> in the list at position <pos>.    \n", blankname);
-  fprintf(stdout, "%s                                         <pos> is the index of the element at which the insertion    \n", blankname);
-  fprintf(stdout, "%s                                         will occcur after, if <pos> starts with '+'. Otherwise <pos>\n", blankname);
-  fprintf(stdout, "%s                                         is the value of the element after which the insertion will  \n", blankname);
-  fprintf(stdout, "%s                                         occur.                                                      \n", blankname);
-  fprintf(stdout, "%s            [-r|--remove <elem>]         remove the element <elem> in the list at position <pos>     \n", blankname);
-  fprintf(stdout, "%s                                                                                                     \n", blankname);
-  fprintf(stdout, "Copyright ©2024 EFREI - Rémi COHEN SCALI                                                               \n");
+  fprintf(stdout, "%s: usage: %s [-hvdxXqN] [-l|-s <filename>] [-t|-A|-P <elem>] [-I|-r <elem,[+]pos>]                      \n", progname, progname);
+  fprintf(stdout, "%s         %sOptions:                                                                                    \n", blankname, blankname);
+  fprintf(stdout, "%s         %sOptions:                                                                                    \n", blankname, blankname);
+  fprintf(stdout, "%s         %s   [-h|--help]                  display this help message                                   \n", blankname, blankname);
+  fprintf(stdout, "%s         %s   [-v|--verbose]               increase verbosity                                          \n", blankname, blankname);
+  fprintf(stdout, "%s         %sCommands:                                                                                   \n", blankname, blankname);
+  fprintf(stdout, "%s         %s   [-l|--load <filename>]       load a linked list from a file <filename>                   \n", blankname, blankname);
+  fprintf(stdout, "%s         %s   [-s|--save <filename>]       save a linked list in a file <filename>                     \n", blankname, blankname);
+  fprintf(stdout, "%s         %s   [-t|--test <elem>]           test if an element <elem> is contained in the list          \n", blankname, blankname);
+  fprintf(stdout, "%s         %s   [-A|--append <elem>]         append the element <elem> in the list                       \n", blankname, blankname);
+  fprintf(stdout, "%s         %s   [-P|--prepend <elem>]        prepend the element <elem> in the list                      \n", blankname, blankname);
+  fprintf(stdout, "%s         %s   [-I|--insert <elem,[+]pos>]  insert the element <elem> in the list at position <pos>.    \n", blankname, blankname);
+  fprintf(stdout, "%s         %s                                <pos> is the index of the element at which the insertion    \n", blankname, blankname);
+  fprintf(stdout, "%s         %s                                will occcur after, if <pos> starts with '+'. Otherwise <pos>\n", blankname, blankname);
+  fprintf(stdout, "%s         %s                                is the value of the element after which the insertion will  \n", blankname, blankname);
+  fprintf(stdout, "%s         %s                                occur.                                                      \n", blankname, blankname);
+  fprintf(stdout, "%s         %s   [-r|--remove <elem,[+]pos>]  remove the element <elem> in the list at position <pos>.    \n", blankname, blankname);
+  fprintf(stdout, "%s         %s                                <pos> is the index of the element at which the insertion    \n", blankname, blankname);
+  fprintf(stdout, "%s         %s                                will occcur after, if <pos> starts with '+'. Otherwise <pos>\n", blankname, blankname);
+  fprintf(stdout, "%s         %s                                is the value of the element after which the insertion will  \n", blankname, blankname);
+  fprintf(stdout, "%s         %s                                occur.                                                      \n", blankname, blankname);
+  fprintf(stdout, "%s         %s                                                                                            \n", blankname, blankname);
+  fprintf(stdout, "Copyright ©2024 EFREI - Rémi COHEN SCALI %s%s                                                            \n", blankname, blankname);
 }
 
 /*
