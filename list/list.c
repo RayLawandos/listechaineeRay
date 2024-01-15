@@ -6,10 +6,17 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <errno.h>
+
 #include "list/list.h"
+
+#define ERR_MESSAGE_MAX_SIZE 	1024
+#define BUFFER_MAX_SIZE 		  20
 
 /* Extern decl of current listechainee */
 extern listechainee_ptr curlist;
+/* Extern decl of program name */
+extern char* progname;
 
 /*
  * free_list
@@ -81,19 +88,77 @@ display_list(listechainee_ptr list)
 listechainee_ptr
 reinit_list(listechainee_ptr list)
 {
-  
+  init_list();
+  return curlist;
 }
 
+/*
+ * load_list
+ *
+ * Load a linked list from the file named <filename>.
+ * If loading fails, NULL is returned.
+ * params:
+ *   filename - in: the name of the file to load the list from
+ * returns:
+ *   the loaded list if successfull
+ *   NULL otherwise
+ */
 listechainee_ptr
 load_list(char* filename)
 {
-  
+  listechainee_ptr list = reinit_list(curlist);
+  FILE *fp = fopen(filename, "r");
+  if (fp == (FILE*)NULL)
+    {
+      char errmesg[ERR_MESSAGE_MAX_SIZE];
+      snprintf(errmesg, ERR_MESSAGE_MAX_SIZE-1, "error: loading list from file '%s'", filename);
+      perror(errmesg);
+      return NULL;
+    }
+  else
+    {
+      char s[BUFFER_MAX_SIZE];
+      char* s_ptr = (char*)NULL;
+      char* e_ptr = (char*)NULL;
+      while ((s_ptr = fgets(s_ptr, BUFFER_MAX_SIZE-1, fp)) != (char*)NULL)
+        {
+          int n = (int)strtol(s_ptr, &e_ptr, 10);
+          if (*e_ptr == ',')
+            s_ptr++;
+          list = append_list(list, n);
+        }
+    }
+  return list;
 }
 
-void
-save_list(char* filename)
+/*
+ *
+ */
+listechainee_ptr
+save_list(listechainee_ptr list, char* filename)
 {
-  
+  FILE *fp = fopen(filename, "w");
+  if (fp == (FILE *)NULL)
+    {
+      char errmesg[ERR_MESSAGE_MAX_SIZE];
+      snprintf(errmesg, ERR_MESSAGE_MAX_SIZE-1, "error: loading list from file '%s'", filename);
+      perror(errmesg);
+      return NULL;
+    }
+  else
+    {
+      listechainee_ptr tmp = list;
+      while (tmp)
+        {
+          fprintf(fp, "%d", tmp->N);
+          if (tmp->next)
+            fprintf(fp, ",");
+          tmp = tmp->next;
+        }
+      fprintf(fp, "\n");
+      fclose(fp);
+    }
+  return list;
 }
 
 /*
