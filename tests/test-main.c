@@ -98,7 +98,11 @@ main(int argc, char** argv)
 
    /* add the tests to the suite */
    /* 6 tests */
-   if ((NULL == CU_add_test(pSuite, "test of test_ix_in_list with null list", 
+   if ((NULL == CU_add_test(pSuite, "test of test_init_list", 
+                            test_init_list)) ||
+       (NULL == CU_add_test(pSuite, "test of test_reinit_list", 
+                            test_reinit_list)) ||
+       (NULL == CU_add_test(pSuite, "test of test_ix_in_list with null list", 
                             test_ix_in_list_with_list_null)) ||
        (NULL == CU_add_test(pSuite, "test of test_ix_in_list with list with ix", 
                             test_ix_in_list_with_list_with_ix)) ||
