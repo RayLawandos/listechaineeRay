@@ -15,11 +15,15 @@
 
 #define NB_TESTS 				20
 #define BUFFER_MAX_SIZE 		10240
+#define ERROR_BUFFER_SIZE		1024
+#define LIST_BUFFER_SIZE		1024
 #define DEBUG_COMMAND_STRING 	"./Debug/listechainee"
 #define RELEASE_COMMAND_STRING 	"./Release/listechainee"
 
 /* Buffer used for reading the command output */
 char buf[BUFFER_MAX_SIZE];
+
+/* */
 
 /*
  * popen_listechainee
@@ -496,16 +500,16 @@ test_command_basic_invocation_vA1P2ds_testlist1_l(void)
   if (datafp == (FILE*)NULL)
     {
       /* Couldn't read the list file, format error msg  */
-      char errmesg[1024];
-      snprintf(errmesg, "%s: error: ", progname);
-      perror(errmsg);
+      char errmesg[ERROR_BUFFER_SIZE];
+      snprintf(errmesg, ERROR_BUFFER_SIZE-1, "error: ");
+      perror(errmesg);
       /* Test failed */
       CU_ASSERT(0 == 1);
     }
   else
     {
-      char buflist[1024];
-      size_t listlen = fread(buflist, 1024, 1, datafp);
+      char buflist[LIST_BUFFER_SIZE];
+      size_t listlen = fread(buflist, LIST_BUFFER_SIZE-1, 1, datafp);
       CU_ASSERT(strncmp("2,1", buflist, listlen) == 0);
     }
   return;
@@ -520,4 +524,21 @@ void
 test_command_basic_invocation_verbose_append_1_prepend_2_display_save_testlist1_l(void)
 {
   TEST_COMMAND_ARGS_VS_RESULT_NB("--verbose --append 1 --prepend 2 --display --save testlist1.l", 18); 
+  FILE* datafp = fopen("testlist1.l", "r");
+  if (datafp == (FILE*)NULL)
+    {
+      /* Couldn't read the list file, format error msg  */
+      char errmesg[ERROR_BUFFER_SIZE];
+      snprintf(errmesg, ERROR_BUFFER_SIZE-1, "error: ");
+      perror(errmesg);
+      /* Test failed */
+      CU_ASSERT(0 == 1);
+    }
+  else
+    {
+      char buflist[LIST_BUFFER_SIZE];
+      size_t listlen = fread(buflist, LIST_BUFFER_SIZE-1, 1, datafp);
+      CU_ASSERT(strncmp("2,1", buflist, listlen) == 0);
+    }
+  return;
 }
