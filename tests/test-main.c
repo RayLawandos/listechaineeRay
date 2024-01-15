@@ -113,7 +113,13 @@ main(int argc, char** argv)
        (NULL == CU_add_test(pSuite, "test of test_elem_in_list with non null list (int limit) #2", 
                             test_elem_in_list_with_non_null_list3)) ||
        (NULL == CU_add_test(pSuite, "test of test_append_list_with_list_null", 
-                            test_append_list_with_list_null))
+                            test_append_list_with_list_null)) ||
+       (NULL == CU_add_test(pSuite, "test of test_append_list_with_list_non_null", 
+                            test_append_list_with_list_non_null)) ||
+       (NULL == CU_add_test(pSuite, "test of test_prepend_list_with_list_null", 
+                            test_prepend_list_with_list_null)) ||
+       (NULL == CU_add_test(pSuite, "test of test_prepend_list_with_list_non_null", 
+                            test_prepend_list_with_list_non_null))
        )
    {
       CU_cleanup_registry();

@@ -14,3 +14,6 @@ void test_elem_in_list_with_non_null_list1(void);
 void test_elem_in_list_with_non_null_list2(void);
 void test_elem_in_list_with_non_null_list3(void);
 void test_append_list_with_list_null(void);
+void test_append_list_with_list_non_null(void);
+void test_prepend_list_with_list_null(void);
+void test_prepend_list_with_list_non_null(void);

@@ -182,9 +182,99 @@ test_append_list_with_list_null(void)
 {
   listechainee_ptr list = (listechainee_ptr)NULL;
   CU_ASSERT((list = append_list((listechainee_ptr)NULL, 0)) != NULL);
+  /* First elem is 0 */
   CU_ASSERT(list->N == 0);
   CU_ASSERT(list->next == (listechainee_ptr)NULL);
   CU_ASSERT((list = append_list(list, 1)) != NULL);
+  /* First elem is 1 */
   CU_ASSERT(list->next->N == 1);
   CU_ASSERT(list->next->next == (listechainee_ptr)NULL);
+  /* Free memory */
+  free_list(list);
+}
+
+/*
+ * Test for append_list
+ *
+ * A test for appending element in non null list
+ */
+void
+test_append_list_with_list_non_null(void)
+{
+  listechainee_ptr list = (listechainee_ptr)malloc(sizeof(struct listechainee_st));
+  list->N = 0;
+  list->next = (listechainee_ptr)NULL;
+  CU_ASSERT((list = append_list(list, 1)) != NULL);
+  /* Second elem is 1 */
+  CU_ASSERT(list->next->N == 1);
+  CU_ASSERT(list->next->next == (listechainee_ptr)NULL);
+  CU_ASSERT(append_list(list, 1) == NULL);
+  /* Second elem is 1 */
+  CU_ASSERT(list->next->N == 1);
+  CU_ASSERT(list->next->next == (listechainee_ptr)NULL);
+  CU_ASSERT(append_list(list, 2) != NULL);
+  /* Thirst elem is 2 */
+  CU_ASSERT(list->next->next->N == 2);
+  CU_ASSERT(list->next->next->next == (listechainee_ptr)NULL);
+  /* free memory */
+  free_list(list);
+}
+
+/*
+ * Test for prepend_list
+ *
+ * A test for prepending element in list
+ */
+void
+test_prepend_list_with_list_null(void)
+{
+  listechainee_ptr list = (listechainee_ptr)NULL;
+  CU_ASSERT((list = prepend_list(list, 0)) != NULL);
+  /* Second elem is 1 */
+  CU_ASSERT(list->N == 0);
+  CU_ASSERT(list->next == (listechainee_ptr)NULL);
+  CU_ASSERT((list = prepend_list(list, 1)) != NULL);
+  /* First elem is 1 */
+  CU_ASSERT(list->N == 1);
+  /* Second elem is 0 */
+  CU_ASSERT(list->next->N == 0);
+  CU_ASSERT(list->next->next == (listechainee_ptr)NULL);
+  /* free memory */
+  free_list(list);
+}
+
+/*
+ * Test for prepend_list
+ *
+ * A test for prepending element in non null list
+ */
+void
+test_prepend_list_with_list_non_null(void)
+{
+  listechainee_ptr list = (listechainee_ptr)malloc(sizeof(struct listechainee_st));
+  list->N = 0;
+  list->next = (listechainee_ptr)NULL;
+  /* Prepend 1 */
+  CU_ASSERT((list = prepend_list(list, 1)) != NULL);
+  /* First elem is 1 */
+  CU_ASSERT(list->N == 1);
+  /* Second elem is 0 */
+  CU_ASSERT(list->next->N == 0);
+  CU_ASSERT(list->next->next == (listechainee_ptr)NULL);
+  CU_ASSERT(prepend_list(list, 1) == NULL);
+  /* First elem is 1 */
+  CU_ASSERT(list->N == 1);
+  /* Second elem is 0 */
+  CU_ASSERT(list->next->N == 0);
+  CU_ASSERT(list->next->next == (listechainee_ptr)NULL);
+  CU_ASSERT((list = prepend_list(list, 2)) != NULL);
+  /* First elem is 2 */
+  CU_ASSERT(list->N == 2);
+  /* Second elem is 1 */
+  CU_ASSERT(list->next->N == 1);
+  /* Third & last elem is 0 */
+  CU_ASSERT(list->next->next->N == 0);
+  CU_ASSERT(list->next->next->next == (listechainee_ptr)NULL);
+  /* free memory */
+  free_list(list);
 }
