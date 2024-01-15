@@ -13,10 +13,10 @@
 
 #include "list/list.h"
 
-#define NB_TESTS 18
-#define BUFFER_MAX_SIZE 10240
-#define DEBUG_COMMAND_STRING "./Debug/listechainee"
-#define RELEASE_COMMAND_STRING "./Release/listechainee"
+#define NB_TESTS 				20
+#define BUFFER_MAX_SIZE 		10240
+#define DEBUG_COMMAND_STRING 	"./Debug/listechainee"
+#define RELEASE_COMMAND_STRING 	"./Release/listechainee"
 
 /* Buffer used for reading the command output */
 char buf[BUFFER_MAX_SIZE];
@@ -253,8 +253,35 @@ char* results[NB_TESTS] = {
   "listechainee: info: Displaying list\n"
   "Liste: 2,1\n",
   /* ==================================================================================================================== 17 = */
+  /*  == $ lisetchainee -v -A 1 -P 2 -d -s testlist1.l                                                                       = */
+  "listechainee: info: option 'v' was incremented for verbosity !\n"
+  "listechainee: info: option 'A' was called for appending '1' !\n"
+  "listechainee: info: appending '1'\n"
+  "listechainee: info: option 'P' was called for prepending '2' !\n"
+  "listechainee: info: prepending '2'\n"
+  "listechainee: info: option 'd' was set !\n"
+  "listechainee: info: Displaying list\n"
+  "Liste: 2,1\n"
+  "listechainee: info: option 's' was called for file 'testlist1.l' !\n"
+  "listechainee: info: Loading/Saving from/to filename 'testlist1.l'\n"
+  "listechainee: info: list was successfully saved to file 'testlist1.l'\n",
+  /* ==================================================================================================================== 18 = */
+  /*  == $ lisetchainee --verbose --append 1 --prepend 2 --display --save testlist1.l                                        = */
+  "listechainee: info: option 'v' was incremented for verbosity !\n"
+  "listechainee: info: option 'A' was called for appending '1' !\n"
+  "listechainee: info: appending '1'\n"
+  "listechainee: info: option 'P' was called for prepending '2' !\n"
+  "listechainee: info: prepending '2'\n"
+  "listechainee: info: option 'd' was set !\n"
+  "listechainee: info: Displaying list\n"
+  "Liste: 2,1\n"
+  "listechainee: info: option 's' was called for file 'testlist1.l' !\n"
+  "listechainee: info: Loading/Saving from/to filename 'testlist1.l'\n"
+  "listechainee: info: list was successfully saved to file 'testlist1.l'\n",
+  /* ==================================================================================================================== 19 = */
   /*  == The End                                                                                                             = */
   NULL
+  /*  ==                                                                                                      NB_TESTS == 20 = */
 };
 
 #define TEST_COMMAND_ARGS_VS_RESULT_NB(args, nb)                    \
@@ -454,4 +481,43 @@ void
 test_command_basic_invocation_verbose_append_1_prepend_2_display(void)
 {
   TEST_COMMAND_ARGS_VS_RESULT_NB("--verbose --append 1 --prepend 2 --display", 16);  
+}
+
+/*
+ * test_command_basic_invocation_vA1P2ds_testlist1_l
+ *
+ * Basic tests for the command invocation with '-v -A 1 -P 2 -d -s testlist1.l' args
+ */
+void
+test_command_basic_invocation_vA1P2ds_testlist1_l(void)
+{
+  TEST_COMMAND_ARGS_VS_RESULT_NB("-v -A 1 -P 2 -d -s testlist1.l", 17);
+  FILE* datafp = fopen("testlist1.l", "r");
+  if (datafp == (FILE*)NULL)
+    {
+      /* Couldn't read the list file, format error msg  */
+      char errmesg[1024];
+      snprintf(errmesg, "%s: error: ", progname);
+      perror(errmsg);
+      /* Test failed */
+      CU_ASSERT(0 == 1);
+    }
+  else
+    {
+      char buflist[1024];
+      size_t listlen = fread(buflist, 1024, 1, datafp);
+      CU_ASSERT(strncmp("2,1", buflist, listlen) == 0);
+    }
+  return;
+}
+
+/*
+ * test_command_basic_invocation_verbose_append_1_prepend_2_display_save_testlist1_l
+ *
+ * Basic tests for the command invocation with '--verbose --append 1 --prepend 2 --display --save testlist1.l' args
+ */
+void
+test_command_basic_invocation_verbose_append_1_prepend_2_display_save_testlist1_l(void)
+{
+  TEST_COMMAND_ARGS_VS_RESULT_NB("--verbose --append 1 --prepend 2 --display --save testlist1.l", 18); 
 }
