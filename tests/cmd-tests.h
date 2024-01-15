@@ -24,4 +24,5 @@ void test_command_basic_invocation_verbose_append_3_display(void);
 void test_command_basic_invocation_verbose_prepend_4_display(void);
 void test_command_basic_invocation_vA1P2d(void);
 void test_command_basic_invocation_verbose_append_1_prepend_2_display(void);
-
+void test_command_basic_invocation_vA1P2ds_testlist1_l(void);
+void test_command_basic_invocation_verbose_append_1_prepend_2_display_save_testlist1_l(void);
