@@ -72,53 +72,6 @@ char* results[NB_TESTS] = {
   "                                                                 occur.                                                      \n"
   "                                                                                                                             \n"
   "Copyright ©2024 EFREI - Rémi COHEN SCALI                                                                                     \n",
-  "listechainee: error: no option was specified!\n"
-  "listechainee: usage: listechainee [-hvdxXqN] [-l|-s <filename>] [-t|-A|-P <elem>] [-I|-r <elem,[+]pos>]                      "
-  "                                 Options:                                                                                    "
-  "                                 Options:                                                                                    "
-  "                                    [-h|--help]                  display this help message                                   "
-  "                                    [-v|--verbose]               increase verbosity                                          "
-  "                                 Commands:                                                                                   "
-  "                                    [-l|--load <filename>]       load a linked list from a file <filename>                   "
-  "                                    [-s|--save <filename>]       save a linked list in a file <filename>                     "
-  "                                    [-t|--test <elem>]           test if an element <elem> is contained in the list          "
-  "                                    [-A|--append <elem>]         append the element <elem> in the list                       "
-  "                                    [-P|--prepend <elem>]        prepend the element <elem> in the list                      "
-  "                                    [-I|--insert <elem,[+]pos>]  insert the element <elem> in the list at position <pos>.    "
-  "                                                                 <pos> is the index of the element at which the insertion    "
-  "                                                                 will occcur after, if <pos> starts with '+'. Otherwise <pos>"
-  "                                                                 is the value of the element after which the insertion will  "
-  "                                                                 occur.                                                      "
-  "                                    [-r|--remove <elem,[+]pos>]  remove the element <elem> in the list at position <pos>.    "
-  "                                                                 <pos> is the index of the element at which the insertion    "
-  "                                                                 will occcur after, if <pos> starts with '+'. Otherwise <pos>"
-  "                                                                 is the value of the element after which the insertion will  "
-  "                                                                 occur.                                                      "
-  "                                                                                                                             "
-  "Copyright ©2024 EFREI - Rémi COHEN SCALI                                                                                     ",
-  "listechainee: usage: listechainee [-hvdxXqN] [-l|-s <filename>] [-t|-A|-P <elem>] [-I|-r <elem,[+]pos>]                      \n"
-  "                                 Options:                                                                                    \n"
-  "                                 Options:                                                                                    \n"
-  "                                    [-h|--help]                  display this help message                                   \n"
-  "                                    [-v|--verbose]               increase verbosity                                          \n"
-  "                                 Commands:                                                                                   \n"
-  "                                    [-l|--load <filename>]       load a linked list from a file <filename>                   \n"
-  "                                    [-s|--save <filename>]       save a linked list in a file <filename>                     \n"
-  "                                    [-t|--test <elem>]           test if an element <elem> is contained in the list          \n"
-  "                                    [-A|--append <elem>]         append the element <elem> in the list                       \n"
-  "                                    [-P|--prepend <elem>]        prepend the element <elem> in the list                      \n"
-  "                                    [-I|--insert <elem,[+]pos>]  insert the element <elem> in the list at position <pos>.    \n"
-  "                                                                 <pos> is the index of the element at which the insertion    \n"
-  "                                                                 will occcur after, if <pos> starts with '+'. Otherwise <pos>\n"
-  "                                                                 is the value of the element after which the insertion will  \n"
-  "                                                                 occur.                                                      \n"
-  "                                    [-r|--remove <elem,[+]pos>]  remove the element <elem> in the list at position <pos>.    \n"
-  "                                                                 <pos> is the index of the element at which the insertion    \n"
-  "                                                                 will occcur after, if <pos> starts with '+'. Otherwise <pos>\n"
-  "                                                                 is the value of the element after which the insertion will  \n"
-  "                                                                 occur.                                                      \n"
-  "                                                                                                                             \n"
-  "Copyright ©2024 EFREI - Rémi COHEN SCALI                                                                                     \n",
   /* ===================================================================================================================== 1 = */
   /*  == $ lisetchainee -v                                                                                                   = */
   "listechainee: info: option 'v' was incremented for verbosity !\n"
@@ -151,29 +104,6 @@ char* results[NB_TESTS] = {
   "listechainee: info: option 'v' was incremented for verbosity !\n"
   "listechainee: info: option 'h' was set !\n"
   "listechainee: error: no option was specified!\n"
-  "listechainee: usage: listechainee [-hvdxXqN] [-l|-s <filename>] [-t|-A|-P <elem>] [-I|-r <elem,[+]pos>]                      "
-  "                                 Options:                                                                                    "
-  "                                 Options:                                                                                    "
-  "                                    [-h|--help]                  display this help message                                   "
-  "                                    [-v|--verbose]               increase verbosity                                          "
-  "                                 Commands:                                                                                   "
-  "                                    [-l|--load <filename>]       load a linked list from a file <filename>                   "
-  "                                    [-s|--save <filename>]       save a linked list in a file <filename>                     "
-  "                                    [-t|--test <elem>]           test if an element <elem> is contained in the list          "
-  "                                    [-A|--append <elem>]         append the element <elem> in the list                       "
-  "                                    [-P|--prepend <elem>]        prepend the element <elem> in the list                      "
-  "                                    [-I|--insert <elem,[+]pos>]  insert the element <elem> in the list at position <pos>.    "
-  "                                                                 <pos> is the index of the element at which the insertion    "
-  "                                                                 will occcur after, if <pos> starts with '+'. Otherwise <pos>"
-  "                                                                 is the value of the element after which the insertion will  "
-  "                                                                 occur.                                                      "
-  "                                    [-r|--remove <elem,[+]pos>]  remove the element <elem> in the list at position <pos>.    "
-  "                                                                 <pos> is the index of the element at which the insertion    "
-  "                                                                 will occcur after, if <pos> starts with '+'. Otherwise <pos>"
-  "                                                                 is the value of the element after which the insertion will  "
-  "                                                                 occur.                                                      "
-  "                                                                                                                             "
-  "Copyright ©2024 EFREI - Rémi COHEN SCALI                                                                                     ",
   "listechainee: usage: listechainee [-hvdxXqN] [-l|-s <filename>] [-t|-A|-P <elem>] [-I|-r <elem,[+]pos>]                      \n"
   "                                 Options:                                                                                    \n"
   "                                 Options:                                                                                    \n"
@@ -201,29 +131,6 @@ char* results[NB_TESTS] = {
   /*  == $ lisetchainee --verbose                                                                                            = */
   "listechainee: info: option 'v' was incremented for verbosity !\n"
   "listechainee: error: no option was specified!\n"
-  "listechainee: usage: listechainee [-hvdxXqN] [-l|-s <filename>] [-t|-A|-P <elem>] [-I|-r <elem,[+]pos>]                      "
-  "                                 Options:                                                                                    "
-  "                                 Options:                                                                                    "
-  "                                    [-h|--help]                  display this help message                                   "
-  "                                    [-v|--verbose]               increase verbosity                                          "
-  "                                 Commands:                                                                                   "
-  "                                    [-l|--load <filename>]       load a linked list from a file <filename>                   "
-  "                                    [-s|--save <filename>]       save a linked list in a file <filename>                     "
-  "                                    [-t|--test <elem>]           test if an element <elem> is contained in the list          "
-  "                                    [-A|--append <elem>]         append the element <elem> in the list                       "
-  "                                    [-P|--prepend <elem>]        prepend the element <elem> in the list                      "
-  "                                    [-I|--insert <elem,[+]pos>]  insert the element <elem> in the list at position <pos>.    "
-  "                                                                 <pos> is the index of the element at which the insertion    "
-  "                                                                 will occcur after, if <pos> starts with '+'. Otherwise <pos>"
-  "                                                                 is the value of the element after which the insertion will  "
-  "                                                                 occur.                                                      "
-  "                                    [-r|--remove <elem,[+]pos>]  remove the element <elem> in the list at position <pos>.    "
-  "                                                                 <pos> is the index of the element at which the insertion    "
-  "                                                                 will occcur after, if <pos> starts with '+'. Otherwise <pos>"
-  "                                                                 is the value of the element after which the insertion will  "
-  "                                                                 occur.                                                      "
-  "                                                                                                                             "
-  "Copyright ©2024 EFREI - Rémi COHEN SCALI                                                                                     ",
   "listechainee: usage: listechainee [-hvdxXqN] [-l|-s <filename>] [-t|-A|-P <elem>] [-I|-r <elem,[+]pos>]                      \n"
   "                                 Options:                                                                                    \n"
   "                                 Options:                                                                                    \n"
@@ -252,29 +159,6 @@ char* results[NB_TESTS] = {
   "listechainee: info: option 'v' was incremented for verbosity !\n"
   "listechainee: info: option 'h' was set !\n"
   "listechainee: error: no option was specified!\n"
-  "listechainee: usage: listechainee [-hvdxXqN] [-l|-s <filename>] [-t|-A|-P <elem>] [-I|-r <elem,[+]pos>]                      "
-  "                                 Options:                                                                                    "
-  "                                 Options:                                                                                    "
-  "                                    [-h|--help]                  display this help message                                   "
-  "                                    [-v|--verbose]               increase verbosity                                          "
-  "                                 Commands:                                                                                   "
-  "                                    [-l|--load <filename>]       load a linked list from a file <filename>                   "
-  "                                    [-s|--save <filename>]       save a linked list in a file <filename>                     "
-  "                                    [-t|--test <elem>]           test if an element <elem> is contained in the list          "
-  "                                    [-A|--append <elem>]         append the element <elem> in the list                       "
-  "                                    [-P|--prepend <elem>]        prepend the element <elem> in the list                      "
-  "                                    [-I|--insert <elem,[+]pos>]  insert the element <elem> in the list at position <pos>.    "
-  "                                                                 <pos> is the index of the element at which the insertion    "
-  "                                                                 will occcur after, if <pos> starts with '+'. Otherwise <pos>"
-  "                                                                 is the value of the element after which the insertion will  "
-  "                                                                 occur.                                                      "
-  "                                    [-r|--remove <elem,[+]pos>]  remove the element <elem> in the list at position <pos>.    "
-  "                                                                 <pos> is the index of the element at which the insertion    "
-  "                                                                 will occcur after, if <pos> starts with '+'. Otherwise <pos>"
-  "                                                                 is the value of the element after which the insertion will  "
-  "                                                                 occur.                                                      "
-  "                                                                                                                             "
-  "Copyright ©2024 EFREI - Rémi COHEN SCALI                                                                                     ",
   "listechainee: usage: listechainee [-hvdxXqN] [-l|-s <filename>] [-t|-A|-P <elem>] [-I|-r <elem,[+]pos>]                      \n"
   "                                 Options:                                                                                    \n"
   "                                 Options:                                                                                    \n"
@@ -299,18 +183,25 @@ char* results[NB_TESTS] = {
   "                                                                                                                             \n"
   "Copyright ©2024 EFREI - Rémi COHEN SCALI                                                                                     \n",
   /* ===================================================================================================================== 5 = */
+  /*  == $ lisetchainee -A 1 -d                                                                                              = */
   "Liste: 1\n",
   /* ===================================================================================================================== 6 = */
+  /*  == $ lisetchainee -P 2 -d                                                                                              = */
   "Liste: 2\n",
   /* ===================================================================================================================== 7 = */
+  /*  == $ lisetchainee --append 3 --display                                                                                 = */
   "Liste: 3\n",
   /* ===================================================================================================================== 8 = */
+  /*  == $ lisetchainee --prepend 4 --display                                                                                = */
   "Liste: 4\n",
   /* ===================================================================================================================== 9 = */
+  /*  == $ lisetchainee -A 1 -P 2 -d                                                                                         = */
   "Liste: 2,1\n",
   /* ==================================================================================================================== 10 = */
+  /*  == $ lisetchainee --append 1 --prepend 2 --display                                                                     = */
   "Liste: 2,1\n",
   /* ==================================================================================================================== 11 = */
+  /*  == $ lisetchainee -v -A 1 -d                                                                                           = */
   "listechainee: info: option 'v' was incremented for verbosity !\n"
   "listechainee: info: option 'A' was called for appending '1' !\n"
   "listechainee: info: appending '1'\n"
@@ -318,6 +209,7 @@ char* results[NB_TESTS] = {
   "listechainee: info: Displaying list\n"
   "Liste: 1\n",
   /* ==================================================================================================================== 12 = */
+  /*  == $ lisetchainee -v -P 2 -d                                                                                           = */
   "listechainee: info: option 'v' was incremented for verbosity !\n"
   "listechainee: info: option 'P' was called for prepending '2' !\n"
   "listechainee: info: prepending '2'\n"
@@ -325,6 +217,7 @@ char* results[NB_TESTS] = {
   "listechainee: info: Displaying list\n"
   "Liste: 2\n",
   /* ==================================================================================================================== 13 = */
+  /*  == $ lisetchainee --verbose --append 3 --display                                                                       = */
   "listechainee: info: option 'v' was incremented for verbosity !\n"
   "listechainee: info: option 'A' was called for appending '3' !\n"
   "listechainee: info: appending '3'\n"
@@ -332,6 +225,7 @@ char* results[NB_TESTS] = {
   "listechainee: info: Displaying list\n"
   "Liste: 3\n",
   /* ==================================================================================================================== 14 = */
+  /*  == $ lisetchainee --verbose --prepend 4 --display                                                                      = */
   "listechainee: info: option 'v' was incremented for verbosity !\n"
   "listechainee: info: option 'P' was called for prepending '4' !\n"
   "listechainee: info: prepending '4'\n"
@@ -339,6 +233,7 @@ char* results[NB_TESTS] = {
   "listechainee: info: Displaying list\n"
   "Liste: 4\n",
   /* ==================================================================================================================== 15 = */
+  /*  == $ lisetchainee -v -A 1 -P 2 -d                                                                                      = */
   "listechainee: info: option 'v' was incremented for verbosity !\n"
   "listechainee: info: option 'A' was called for appending '1' !\n"
   "listechainee: info: appending '1'\n"
@@ -348,6 +243,7 @@ char* results[NB_TESTS] = {
   "listechainee: info: Displaying list\n"
   "Liste: 2,1\n",
   /* ==================================================================================================================== 16 = */
+  /*  == $ lisetchainee --verbose --append 1 --prepend 2 --display                                                           = */
   "listechainee: info: option 'v' was incremented for verbosity !\n"
   "listechainee: info: option 'A' was called for appending '1' !\n"
   "listechainee: info: appending '1'\n"
@@ -357,6 +253,7 @@ char* results[NB_TESTS] = {
   "listechainee: info: Displaying list\n"
   "Liste: 2,1\n",
   /* ==================================================================================================================== 17 = */
+  /*  == The End                                                                                                             = */
   NULL
 };
 
