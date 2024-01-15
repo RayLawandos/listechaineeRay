@@ -57,6 +57,23 @@ init_list(void)
 }
 
 /*
+ * reinit_list
+ *
+ * Re-initialize the current list as the list provided. If curlist
+ * is not null, free it.
+ * params:
+ *   void
+ * returns:
+ *   void
+ */
+listechainee_ptr
+reinit_list(listechainee_ptr list)
+{
+  init_list();
+  return (curlist = list);
+}
+
+/*
  * display_list
  *
  * Take a list as input and displays all nodes in it. If list
@@ -83,13 +100,6 @@ display_list(listechainee_ptr list)
         }
       fprintf(stdout, "\n");
     }
-}
-
-listechainee_ptr
-reinit_list(listechainee_ptr list)
-{
-  init_list();
-  return curlist;
 }
 
 /*
