@@ -10,6 +10,35 @@
 #include "list/list.h"
 #include <CUnit/Basic.h>
 
+/* List chainee courante */
+extern listechainee_ptr curlist;
+
+
+/*
+ * Test for init_list
+ */
+void
+test_init_list(void)
+{
+  /* Assert test conditions */
+  init_list();
+  CU_ASSERT((listechainee_ptr)NULL == curlist);
+}
+
+/*
+ * Test for reinit_list
+ */
+void
+test_reinit_list(void)
+{
+  /* Assert test conditions */
+  listechainee_ptr list = (listechainee_ptr)malloc(sizeof(struct listechainee_st));
+  CU_ASSERT(list != (listechainee_ptr)NULL);
+  list->N = 1;
+  list->next = (listechainee_ptr)NULL;
+  CU_ASSERT(reinit_list(list) == curlist);
+}
+
 /*
  * Test for test_ix_in_list
  *
@@ -18,7 +47,6 @@
 void
 test_ix_in_list_with_list_null(void)
 {
-  /* Assert test conditions */
   /* Add ix 0 in null list is ok */
   CU_ASSERT(test_ix_in_list((listechainee_ptr)NULL, -1) == 0);
   CU_ASSERT(test_ix_in_list((listechainee_ptr)NULL, 0) == 1);
