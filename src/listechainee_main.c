@@ -23,6 +23,7 @@ static struct option long_options[] =
     {"help",    no_argument,       0,  'h' },
     {"verbose", no_argument,       0,  'v' },
     {"display", no_argument,       0,  'd' },
+    {"init",    no_argument,       0,  'i' },
     {"load",    required_argument, 0,  'l' },
     {"save",    required_argument, 0,  's' },
     {"test",    required_argument, 0,  't' },
@@ -50,6 +51,7 @@ static int h_opt = 0;			// Option for help
 static int d_opt = 0;			// Option for displaying list 
 static int l_opt = 0;			// Option for loading file
 static int s_opt = 0;			// Option for saving file
+static int i_opt = 0;			// Option for initializing the list
 static int t_opt = 0;			// Option for testing element
 static int A_opt = 0;			// Option for appending element
 static int P_opt = 0;			// Option for prepending element
@@ -73,12 +75,13 @@ int arg_elem = 0;						// Argument handling element
 void
 print_help(void)
 {
-  fprintf(stdout, "%s: usage: %s [-hvdxXqN] [-l|-s <filename>] [-t|-A|-P <elem>] [-I|-r <elem,[+]pos>]                      \n", progname, progname);
+  fprintf(stdout, "%s: usage: %s [-hvdxXqNi] [-l|-s <filename>] [-t|-A|-P <elem>] [-I|-r <elem,[+]pos>]                     \n", progname, progname);
   fprintf(stdout, "%s         %sOptions:                                                                                    \n", blankname, blankname);
   fprintf(stdout, "%s         %sOptions:                                                                                    \n", blankname, blankname);
   fprintf(stdout, "%s         %s   [-h|--help]                  display this help message                                   \n", blankname, blankname);
   fprintf(stdout, "%s         %s   [-v|--verbose]               increase verbosity                                          \n", blankname, blankname);
   fprintf(stdout, "%s         %sCommands:                                                                                   \n", blankname, blankname);
+  fprintf(stdout, "%s         %s   [-i|--init]                  init a linked list                                          \n", blankname, blankname);
   fprintf(stdout, "%s         %s   [-l|--load <filename>]       load a linked list from a file <filename>                   \n", blankname, blankname);
   fprintf(stdout, "%s         %s   [-s|--save <filename>]       save a linked list in a file <filename>                     \n", blankname, blankname);
   fprintf(stdout, "%s         %s   [-t|--test <elem>]           test if an element <elem> is contained in the list          \n", blankname, blankname);
@@ -124,7 +127,7 @@ int main(int argc, char** argv)
     int this_option_optind = optind ? optind : 1;
     int option_index = 0;
 
-    c = getopt_long(argc, argv, "hvdl:s:t:A:P:I:xXr:qN",
+    c = getopt_long(argc, argv, "hvdl:s:i:t:A:P:I:xXr:qN",
                     long_options, &option_index);
     if (c == -1)
       break;
@@ -147,6 +150,12 @@ int main(int argc, char** argv)
       d_opt = 1;
       if (v_opt)
         fprintf(stdout, "%s: info: option 'd' was set !\n", progname);
+      break;
+
+    case 'i':
+      i_opt = 1;
+      if (v_opt)
+        fprintf(stdout, "%s: info: option 'i' was set !\n", progname);
       break;
 
     case 'l':
@@ -271,6 +280,13 @@ int main(int argc, char** argv)
         if (v_opt)
           fprintf(stdout, "%s: info: Deleting element\n", progname);
         x_opt = X_opt = 0;
+      }
+    else if (i_opt)
+      {
+        one_opt = 1;        
+        if (v_opt)
+          fprintf(stdout, "%s: info: Initializing current list !\n", progname);
+        init_list();
       }
     else if (l_opt || s_opt)
       {
