@@ -19,7 +19,7 @@ void init_list(void);
 void display_list(listechainee_ptr);
 listechainee_ptr reinit_list(listechainee_ptr);
 listechainee_ptr load_list(char*);
-void save_list(char*);
+listechainee_ptr save_list(listechainee_ptr, char*);
 int test_elem_in_list(listechainee_ptr, int);
 int test_ix_in_list(listechainee_ptr, int);
 listechainee_ptr append_list(listechainee_ptr, int);
