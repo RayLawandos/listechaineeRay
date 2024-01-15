@@ -13,7 +13,7 @@
 
 #include "list/list.h"
 
-#define NB_TESTS 				20
+#define NB_TESTS 				22
 #define BUFFER_MAX_SIZE 		10240
 #define ERROR_BUFFER_SIZE		1024
 #define LIST_BUFFER_SIZE		1024
@@ -283,9 +283,27 @@ char* results[NB_TESTS] = {
   "listechainee: info: Loading/Saving from/to filename 'testlist1.l'\n"
   "listechainee: info: list was successfully saved to file 'testlist1.l'\n",
   /* ==================================================================================================================== 19 = */
+  /*  == $ lisetchainee -v -l testlist1.l -d                                                                                 = */
+  "listechainee: info: option 'v' was incremented for verbosity !\n"
+  "listechainee: info: option 'l' was called for file 'testlist1.l' !\n"
+  "listechainee: info: Loading/Saving from/to filename 'testlist1.l'\n"
+  "listechainee: info: list was successfully loaded from file 'testlist1.l'\n"
+  "listechainee: info: option 'd' was set !\n"
+  "listechainee: info: Displaying list\n"
+  "Liste: 2,1\n",
+  /* ==================================================================================================================== 20 = */
+  /*  == $ lisetchainee -v -l testlist1.l -d                                                                                 = */
+  "listechainee: info: option 'v' was incremented for verbosity !\n"
+  "listechainee: info: option 'l' was called for file 'testlist1.l' !\n"
+  "listechainee: info: Loading/Saving from/to filename 'testlist1.l'\n"
+  "listechainee: info: list was successfully loaded from file 'testlist1.l'\n"
+  "listechainee: info: option 'd' was set !\n"
+  "listechainee: info: Displaying list\n"
+  "Liste: 2,1\n",
+  /* ==================================================================================================================== 21 = */
   /*  == The End                                                                                                             = */
   NULL
-  /*  ==                                                                                                      NB_TESTS == 20 = */
+  /*  ==                                                                                                      NB_TESTS == 22 = */
 };
 
 #define TEST_COMMAND_ARGS_VS_RESULT_NB(args, nb)                    \
@@ -496,7 +514,9 @@ void
 test_command_basic_invocation_vA1P2ds_testlist1_l(void)
 {
   TEST_COMMAND_ARGS_VS_RESULT_NB("-v -A 1 -P 2 -d -s testlist1.l", 17);
+  /* Open the saved list file */ 
   FILE* datafp = fopen("testlist1.l", "r");
+  /* Open failed */
   if (datafp == (FILE*)NULL)
     {
       /* Couldn't read the list file, format error msg  */
@@ -508,8 +528,11 @@ test_command_basic_invocation_vA1P2ds_testlist1_l(void)
     }
   else
     {
+      /* Buffer for reading file content */
       char buflist[LIST_BUFFER_SIZE];
+      /* Read list file content */
       size_t listlen = fread(buflist, LIST_BUFFER_SIZE-1, 1, datafp);
+      /* Assert the list content */
       CU_ASSERT(strncmp("2,1", buflist, listlen) == 0);
     }
   return;
@@ -524,7 +547,9 @@ void
 test_command_basic_invocation_verbose_append_1_prepend_2_display_save_testlist1_l(void)
 {
   TEST_COMMAND_ARGS_VS_RESULT_NB("--verbose --append 1 --prepend 2 --display --save testlist1.l", 18); 
+  /* Open the saved list file */ 
   FILE* datafp = fopen("testlist1.l", "r");
+  /* Open failed */
   if (datafp == (FILE*)NULL)
     {
       /* Couldn't read the list file, format error msg  */
@@ -536,9 +561,34 @@ test_command_basic_invocation_verbose_append_1_prepend_2_display_save_testlist1_
     }
   else
     {
+      /* Buffer for reading file content */
       char buflist[LIST_BUFFER_SIZE];
+      /* Read list file content */
       size_t listlen = fread(buflist, LIST_BUFFER_SIZE-1, 1, datafp);
+      /* Assert the list content */
       CU_ASSERT(strncmp("2,1", buflist, listlen) == 0);
     }
   return;
+}
+
+/*
+ * test_command_basic_invocation_vl_testlist1_l_d
+ *
+ * Basic tests for the command invocation with '-v -l testlist1.l -d' args
+ */
+void
+test_command_basic_invocation_vl_testlist1_l_d(void)
+{
+  TEST_COMMAND_ARGS_VS_RESULT_NB("-v -l testlist1.l -d", 19); 
+}
+
+/*
+ * test_command_basic_invocation_verbose_load_testlist1_l_display
+ *
+ * Basic tests for the command invocation with '--verbose --load testlist1.l --display' args
+ */
+void
+test_command_basic_invocation_verbose_load_testlist1_l_display(void)
+{
+  TEST_COMMAND_ARGS_VS_RESULT_NB("--verbose --load testlist1.l --display", 20); 
 }

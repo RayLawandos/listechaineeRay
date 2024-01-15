@@ -157,7 +157,11 @@ main(int argc, char** argv)
        (NULL == CU_add_test(pSuite, "test of basic command launch (-v -A 1 -P 2 -d -s testlist1.l)", 
                             test_command_basic_invocation_vA1P2ds_testlist1_l)) ||
        (NULL == CU_add_test(pSuite, "test of basic command launch (--verbose --append 1 --prepend 2 --display --save testlist1.l)", 
-                            test_command_basic_invocation_verbose_append_1_prepend_2_display_save_testlist1_l))
+                            test_command_basic_invocation_verbose_append_1_prepend_2_display_save_testlist1_l)) ||
+       (NULL == CU_add_test(pSuite, "test of basic command launch (-v -l testlist1.l -d)", 
+                            test_command_basic_invocation_vl_testlist1_l_d)) ||
+       (NULL == CU_add_test(pSuite, "test of basic command launch (--verbose --load testlist1.l --display)", 
+                            test_command_basic_invocation_verbose_load_testlist1_l_display))
        )
    {
       CU_cleanup_registry();
