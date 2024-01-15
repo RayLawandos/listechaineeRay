@@ -47,14 +47,68 @@ popen_listechainee(char* args)
  */
 char* results[NB_TESTS] = {
   "",
+  "listechainee: usage: listechainee [-hvdxXqN] [-l|-s <filename>] [-t|-A|-P|-I|-r <elem>]                                    \n"
+  "                     Options:                                                                                    \n"
+  "                     Options:                                                                                    \n"
+  "                        [-h|--help]                  display this help message                                   \n"
+  "                        [-v|--verbose]               increase verbosity                                          \n"
+  "                     Commands:\n"
+  "                        [-l|--load <filename>]       load a linked list from a file <filename>                   \n"
+  "                        [-s|--save <filename>]       save a linked list in a file <filename>                     \n"
+  "                        [-t|--test <elem>]           test if an element <elem> is contained in the list          \n"
+  "                        [-A|--append <elem>]         append the element <elem> in the list                       \n"
+  "                        [-P|--prepend <elem>]        prepend the element <elem> in the list                      \n"
+  "                        [-I|--insert <elem,[+]pos>]  insert the element <elem> in the list at position <pos>.    \n"
+  "                                                     <pos> is the index of the element at which the insertion    \n"
+  "                                                     will occcur after, if <pos> starts with '+'. Otherwise <pos>\n"
+  "                                                     is the value of the element after which the insertion will  \n"
+  "                                                     occur.                                                      \n"
+  "                        [-r|--remove <elem>]         remove the element <elem> in the list at position <pos>     \n"
+  "                                                                                                                 \n"
+  "Copyright ©2024 EFREI - Rémi COHEN SCALI                                                               \n",
+  "listechainee: info: option 'v' was incremented for verbosity !\n"
+  "listechainee: info: option 'h' was set !\n"
+  "listechainee: usage: listechainee [-hvdxXqN] [-l|-s <filename>] [-t|-A|-P|-I|-r <elem>]                                    \n"
+  "                     Options:                                                                                    \n"
+  "                     Options:                                                                                    \n"
+  "                        [-h|--help]                  display this help message                                   \n"
+  "                        [-v|--verbose]               increase verbosity                                          \n"
+  "                     Commands:\n"
+  "                        [-l|--load <filename>]       load a linked list from a file <filename>                   \n"
+  "                        [-s|--save <filename>]       save a linked list in a file <filename>                     \n"
+  "                        [-t|--test <elem>]           test if an element <elem> is contained in the list          \n"
+  "                        [-A|--append <elem>]         append the element <elem> in the list                       \n"
+  "                        [-P|--prepend <elem>]        prepend the element <elem> in the list                      \n"
+  "                        [-I|--insert <elem,[+]pos>]  insert the element <elem> in the list at position <pos>.    \n"
+  "                                                     <pos> is the index of the element at which the insertion    \n"
+  "                                                     will occcur after, if <pos> starts with '+'. Otherwise <pos>\n"
+  "                                                     is the value of the element after which the insertion will  \n"
+  "                                                     occur.                                                      \n"
+  "                        [-r|--remove <elem>]         remove the element <elem> in the list at position <pos>     \n"
+  "                                                                                                                 \n"
+  "Copyright ©2024 EFREI - Rémi COHEN SCALI                                                               \n",
   "listechainee: info: option 'v' was incremented for verbosity !",
   "listechainee: info: option 'v' was incremented for verbosity !\n"
   "listechainee: info: option 'h' was set !\n"
-  "listechainee: usage: listechainee [-hvdAPxXqN] [-l <filename>] [-s <filename>] [-t|-I|-r <elem>]\n",
-  "listechainee: info: option 'v' was incremented for verbosity !",
-  "listechainee: info: option 'v' was incremented for verbosity !\n"
-  "listechainee: info: option 'h' was set !\n"
-  "listechainee: usage: listechainee [-hvdAPxXqN] [-l <filename>] [-s <filename>] [-t|-I|-r <elem>]\n",
+  "listechainee: usage: listechainee [-hvdxXqN] [-l|-s <filename>] [-t|-A|-P|-I|-r <elem>]                                    \n"
+  "                     Options:                                                                                    \n"
+  "                     Options:                                                                                    \n"
+  "                        [-h|--help]                  display this help message                                   \n"
+  "                        [-v|--verbose]               increase verbosity                                          \n"
+  "                     Commands:\n"
+  "                        [-l|--load <filename>]       load a linked list from a file <filename>                   \n"
+  "                        [-s|--save <filename>]       save a linked list in a file <filename>                     \n"
+  "                        [-t|--test <elem>]           test if an element <elem> is contained in the list          \n"
+  "                        [-A|--append <elem>]         append the element <elem> in the list                       \n"
+  "                        [-P|--prepend <elem>]        prepend the element <elem> in the list                      \n"
+  "                        [-I|--insert <elem,[+]pos>]  insert the element <elem> in the list at position <pos>.    \n"
+  "                                                     <pos> is the index of the element at which the insertion    \n"
+  "                                                     will occcur after, if <pos> starts with '+'. Otherwise <pos>\n"
+  "                                                     is the value of the element after which the insertion will  \n"
+  "                                                     occur.                                                      \n"
+  "                        [-r|--remove <elem>]         remove the element <elem> in the list at position <pos>     \n"
+  "                                                                                                                 \n"
+  "Copyright ©2024 EFREI - Rémi COHEN SCALI                                                               \n",
   "Liste: 1\n",
   "Liste: 2\n",
   "Liste: 3\n",
