@@ -350,16 +350,16 @@ popen_dup_listechainee(int* fd_in, int* fd_out, int* fd_err, int nargs, ...)
   /* Test assertions */                                                                             \
   if (fpout)                                                                                        \
     {                                                                                               \
-      if (strncmp(total_out, results[42], strlen(results[42])) != 0)                                \
+      if (strncmp(total_out, results[nbout], strlen(results[nbout])) != 0)                                \
         fprintf(stdout, "\n%s\n", total_out);                                                       \
-      CU_ASSERT(strncmp(total_out, results[42], strlen(results[42])) == 0);                         \
+      CU_ASSERT(strncmp(total_out, results[nbout], strlen(results[nbout])) == 0);                         \
       free((void*)total_out);                                                                       \
     }                                                                                               \
   if (fperr)                                                                                        \
     {                                                                                               \
-      if (strncmp(total_err, errres[-1], strlen(errres[-1])) != 0)                                  \
+      if (strncmp(total_err, errres[nberr], strlen(errres[nberr])) != 0)                                  \
         fprintf(stdout, "\n%s\n", total_err);                                                       \
-      CU_ASSERT(strncmp(total_err, errres[-1],  strlen(errres[-1]))  == 0);                         \
+      CU_ASSERT(strncmp(total_err, errres[nberr],  strlen(errres[nberr]))  == 0);                         \
       free((void*)total_err);                                                                       \
     }                                                                                               \
                                                                                                     \
