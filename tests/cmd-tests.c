@@ -5,323 +5,368 @@
  * These tests test pre-condition, post-conditions and functional 
  */
 
+#define _GNU_SOURCE
+#include <sys/types.h>
+#include <sys/stat.h>
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
+#include <stdarg.h>
+#include <fcntl.h> 
+
+#include <sys/wait.h>
+#include <sys/types.h>
 
 #include <CUnit/Basic.h>
 
 #include "list/list.h"
+#include "tests/cmd-tests.h"
+#include "tests/tests-results.h"
 
-#define NB_TESTS 				22
-#define BUFFER_MAX_SIZE 		10240
-#define ERROR_BUFFER_SIZE		1024
-#define LIST_BUFFER_SIZE		1024
-#define DEBUG_COMMAND_STRING 	"./Debug/listechainee"
-#define RELEASE_COMMAND_STRING 	"./Release/listechainee"
+/* Constants */
+#define BUFFER_MAX_SIZE             4096
+#define ERROR_BUFFER_SIZE           1024
+#define LIST_BUFFER_SIZE            1024
 
-/* Buffer used for reading the command output */
-char buf[BUFFER_MAX_SIZE];
+/* Numbering for pipe ends (reading, writing) */
+#define READ_PIPE_END               0
+#define WRITE_PIPE_END              1
 
-/* */
+/* Buffers used for reading the command output */
+char outbuf[BUFFER_MAX_SIZE];
+char errbuf[BUFFER_MAX_SIZE];
+
+/* Command to launch */
+const char const* command_pathname = (const char const*)NULL;
+
+/*
+ * stat_listechainee
+ *
+ * Try all known command path in order to determine which to use
+ */
+const char const*
+stat_listechainee(const char* pathname)
+{
+  struct stat statst;
+
+  /* Test provided path */
+  if (pathname && stat(pathname, &statst) == 0)
+    return (const char const*)pathname;
+  /* If no path provided, test default command to use */
+  else if (!pathname && stat(USED_COMMAND_STRING, &statst) == 0)
+    return USED_COMMAND_STRING;
+  /* If no path provided, test local command */
+  else if (!pathname && stat(LOCAL_COMMAND_STRING, &statst) == 0)
+    return LOCAL_COMMAND_STRING;
+  /* If no path provided, test Debug command */
+  else if (!pathname && stat(DEBUG_COMMAND_STRING, &statst) == 0)
+    return DEBUG_COMMAND_STRING;
+  /* If no path provided, test RelWithDebInfo command */
+  else if (!pathname && stat(RELWDEBINFO_COMMAND_STRING, &statst) == 0)
+    return RELWDEBINFO_COMMAND_STRING;
+
+  return (const char const*)NULL;
+}
 
 /*
  * popen_listechainee
  *
- * Open a pipe for reading from launched command listechainee
+ * Opens a pipe for reading from launched command listechainee.
+ * This function uses only standard input for reading from
+ * the child process.
+ * cf. open_dup_listechainee for reading from standard output and
+ * standard error and also for writing to standard input.
  */
 FILE *
 popen_listechainee(char* args)
 {
   /* Compute the size of the string to allocate for command */
-  char *cmd = (char*)malloc(strlen("./Debug/listechainee") + strlen(args) + 2);
+  char *cmd = (char*)malloc(strlen(command_pathname) + strlen(args) + 2);
+
   /* Format the command  */
-  sprintf(cmd, DEBUG_COMMAND_STRING " %s", args);
+  sprintf(cmd, "%s %s", command_pathname, args);
+
   /* Open the pipe for launching the command with a shell: 'sh -c "<command>"' */
   /* The returned file pointer will allow us to read ("r") the command standard output/error  */
   FILE *fp = popen(cmd, "r");
+
   /* Free the command string allocated */
   free((void*)cmd);
+
   /* Return the file pointer */
   return fp;
 }
 
 /*
- * These are the expected results as strings
+ * popen_dup_listechainee
+ *
+ * Opens a pipe for reading from standard output and error and for
+ * writing to standard input of the child process.
  */
-char* results[NB_TESTS] = {
-  /* ===================================================================================================================== 0 = */
-  /*  == $ lisetchainee                                                                                                      = */
-  "listechainee: error: no option was specified!\n"
-  "listechainee: usage: listechainee [-hvdxXqNi] [-l|-s <filename>] [-t|-A|-P <elem>] [-I|-r <elem,[+]pos>]                     \n"
-  "                                 Options:                                                                                    \n"
-  "                                 Options:                                                                                    \n"
-  "                                    [-h|--help]                  display this help message                                   \n"
-  "                                    [-v|--verbose]               increase verbosity                                          \n"
-  "                                 Commands:                                                                                   \n"
-  "                                    [-i|--init]                  init a linked list                                          \n"
-  "                                    [-l|--load <filename>]       load a linked list from a file <filename>                   \n"
-  "                                    [-s|--save <filename>]       save a linked list in a file <filename>                     \n"
-  "                                    [-t|--test <elem>]           test if an element <elem> is contained in the list          \n"
-  "                                    [-A|--append <elem>]         append the element <elem> in the list                       \n"
-  "                                    [-P|--prepend <elem>]        prepend the element <elem> in the list                      \n"
-  "                                    [-I|--insert <elem,[+]pos>]  insert the element <elem> in the list at position <pos>.    \n"
-  "                                                                 <pos> is the index of the element at which the insertion    \n"
-  "                                                                 will occcur after, if <pos> starts with '+'. Otherwise <pos>\n"
-  "                                                                 is the value of the element after which the insertion will  \n"
-  "                                                                 occur.                                                      \n"
-  "                                    [-r|--remove <elem,[+]pos>]  remove the element <elem> in the list at position <pos>.    \n"
-  "                                                                 <pos> is the index of the element at which the insertion    \n"
-  "                                                                 will occcur after, if <pos> starts with '+'. Otherwise <pos>\n"
-  "                                                                 is the value of the element after which the insertion will  \n"
-  "                                                                 occur.                                                      \n"
-  "                                                                                                                             \n"
-  "Copyright ©2024 EFREI - Rémi COHEN SCALI                                                                                     \n",
-  /* ===================================================================================================================== 1 = */
-  /*  == $ lisetchainee -v                                                                                                   = */
-  "listechainee: info: option 'v' was incremented for verbosity !\n"
-  "listechainee: error: no option was specified!\n"
-  "listechainee: usage: listechainee [-hvdxXqNi] [-l|-s <filename>] [-t|-A|-P <elem>] [-I|-r <elem,[+]pos>]                     \n"
-  "                                 Options:                                                                                    \n"
-  "                                 Options:                                                                                    \n"
-  "                                    [-h|--help]                  display this help message                                   \n"
-  "                                    [-v|--verbose]               increase verbosity                                          \n"
-  "                                 Commands:                                                                                   \n"
-  "                                    [-i|--init]                  init a linked list                                          \n"
-  "                                    [-l|--load <filename>]       load a linked list from a file <filename>                   \n"
-  "                                    [-s|--save <filename>]       save a linked list in a file <filename>                     \n"
-  "                                    [-t|--test <elem>]           test if an element <elem> is contained in the list          \n"
-  "                                    [-A|--append <elem>]         append the element <elem> in the list                       \n"
-  "                                    [-P|--prepend <elem>]        prepend the element <elem> in the list                      \n"
-  "                                    [-I|--insert <elem,[+]pos>]  insert the element <elem> in the list at position <pos>.    \n"
-  "                                                                 <pos> is the index of the element at which the insertion    \n"
-  "                                                                 will occcur after, if <pos> starts with '+'. Otherwise <pos>\n"
-  "                                                                 is the value of the element after which the insertion will  \n"
-  "                                                                 occur.                                                      \n"
-  "                                    [-r|--remove <elem,[+]pos>]  remove the element <elem> in the list at position <pos>.    \n"
-  "                                                                 <pos> is the index of the element at which the insertion    \n"
-  "                                                                 will occcur after, if <pos> starts with '+'. Otherwise <pos>\n"
-  "                                                                 is the value of the element after which the insertion will  \n"
-  "                                                                 occur.                                                      \n"
-  "                                                                                                                             \n"
-  "Copyright ©2024 EFREI - Rémi COHEN SCALI                                                                                     \n",
-  /* ===================================================================================================================== 2 = */
-  /*  == $ lisetchainee -v -h                                                                                                = */
-  "listechainee: info: option 'v' was incremented for verbosity !\n"
-  "listechainee: info: option 'h' was set !\n"
-  "listechainee: error: no option was specified!\n"
-  "listechainee: usage: listechainee [-hvdxXqNi] [-l|-s <filename>] [-t|-A|-P <elem>] [-I|-r <elem,[+]pos>]                     \n"
-  "                                 Options:                                                                                    \n"
-  "                                 Options:                                                                                    \n"
-  "                                    [-h|--help]                  display this help message                                   \n"
-  "                                    [-v|--verbose]               increase verbosity                                          \n"
-  "                                 Commands:                                                                                   \n"
-  "                                    [-i|--init]                  init a linked list                                          \n"
-  "                                    [-l|--load <filename>]       load a linked list from a file <filename>                   \n"
-  "                                    [-s|--save <filename>]       save a linked list in a file <filename>                     \n"
-  "                                    [-t|--test <elem>]           test if an element <elem> is contained in the list          \n"
-  "                                    [-A|--append <elem>]         append the element <elem> in the list                       \n"
-  "                                    [-P|--prepend <elem>]        prepend the element <elem> in the list                      \n"
-  "                                    [-I|--insert <elem,[+]pos>]  insert the element <elem> in the list at position <pos>.    \n"
-  "                                                                 <pos> is the index of the element at which the insertion    \n"
-  "                                                                 will occcur after, if <pos> starts with '+'. Otherwise <pos>\n"
-  "                                                                 is the value of the element after which the insertion will  \n"
-  "                                                                 occur.                                                      \n"
-  "                                    [-r|--remove <elem,[+]pos>]  remove the element <elem> in the list at position <pos>.    \n"
-  "                                                                 <pos> is the index of the element at which the insertion    \n"
-  "                                                                 will occcur after, if <pos> starts with '+'. Otherwise <pos>\n"
-  "                                                                 is the value of the element after which the insertion will  \n"
-  "                                                                 occur.                                                      \n"
-  "                                                                                                                             \n"
-  "Copyright ©2024 EFREI - Rémi COHEN SCALI                                                                                     \n",
-  /* ===================================================================================================================== 3 = */
-  /*  == $ lisetchainee --verbose                                                                                            = */
-  "listechainee: info: option 'v' was incremented for verbosity !\n"
-  "listechainee: error: no option was specified!\n"
-  "listechainee: usage: listechainee [-hvdxXqNi] [-l|-s <filename>] [-t|-A|-P <elem>] [-I|-r <elem,[+]pos>]                     \n"
-  "                                 Options:                                                                                    \n"
-  "                                 Options:                                                                                    \n"
-  "                                    [-h|--help]                  display this help message                                   \n"
-  "                                    [-v|--verbose]               increase verbosity                                          \n"
-  "                                 Commands:                                                                                   \n"
-  "                                    [-i|--init]                  init a linked list                                          \n"
-  "                                    [-l|--load <filename>]       load a linked list from a file <filename>                   \n"
-  "                                    [-s|--save <filename>]       save a linked list in a file <filename>                     \n"
-  "                                    [-t|--test <elem>]           test if an element <elem> is contained in the list          \n"
-  "                                    [-A|--append <elem>]         append the element <elem> in the list                       \n"
-  "                                    [-P|--prepend <elem>]        prepend the element <elem> in the list                      \n"
-  "                                    [-I|--insert <elem,[+]pos>]  insert the element <elem> in the list at position <pos>.    \n"
-  "                                                                 <pos> is the index of the element at which the insertion    \n"
-  "                                                                 will occcur after, if <pos> starts with '+'. Otherwise <pos>\n"
-  "                                                                 is the value of the element after which the insertion will  \n"
-  "                                                                 occur.                                                      \n"
-  "                                    [-r|--remove <elem,[+]pos>]  remove the element <elem> in the list at position <pos>.    \n"
-  "                                                                 <pos> is the index of the element at which the insertion    \n"
-  "                                                                 will occcur after, if <pos> starts with '+'. Otherwise <pos>\n"
-  "                                                                 is the value of the element after which the insertion will  \n"
-  "                                                                 occur.                                                      \n"
-  "                                                                                                                             \n"
-  "Copyright ©2024 EFREI - Rémi COHEN SCALI                                                                                     \n",
-  /* ===================================================================================================================== 4 = */
-  /*  == $ lisetchainee --verbose --help                                                                                     = */
-  "listechainee: info: option 'v' was incremented for verbosity !\n"
-  "listechainee: info: option 'h' was set !\n"
-  "listechainee: error: no option was specified!\n"
-  "listechainee: usage: listechainee [-hvdxXqNi] [-l|-s <filename>] [-t|-A|-P <elem>] [-I|-r <elem,[+]pos>]                     \n"
-  "                                 Options:                                                                                    \n"
-  "                                 Options:                                                                                    \n"
-  "                                    [-h|--help]                  display this help message                                   \n"
-  "                                    [-v|--verbose]               increase verbosity                                          \n"
-  "                                 Commands:                                                                                   \n"
-  "                                    [-i|--init]                  init a linked list                                          \n"
-  "                                    [-l|--load <filename>]       load a linked list from a file <filename>                   \n"
-  "                                    [-s|--save <filename>]       save a linked list in a file <filename>                     \n"
-  "                                    [-t|--test <elem>]           test if an element <elem> is contained in the list          \n"
-  "                                    [-A|--append <elem>]         append the element <elem> in the list                       \n"
-  "                                    [-P|--prepend <elem>]        prepend the element <elem> in the list                      \n"
-  "                                    [-I|--insert <elem,[+]pos>]  insert the element <elem> in the list at position <pos>.    \n"
-  "                                                                 <pos> is the index of the element at which the insertion    \n"
-  "                                                                 will occcur after, if <pos> starts with '+'. Otherwise <pos>\n"
-  "                                                                 is the value of the element after which the insertion will  \n"
-  "                                                                 occur.                                                      \n"
-  "                                    [-r|--remove <elem,[+]pos>]  remove the element <elem> in the list at position <pos>.    \n"
-  "                                                                 <pos> is the index of the element at which the insertion    \n"
-  "                                                                 will occcur after, if <pos> starts with '+'. Otherwise <pos>\n"
-  "                                                                 is the value of the element after which the insertion will  \n"
-  "                                                                 occur.                                                      \n"
-  "                                                                                                                             \n"
-  "Copyright ©2024 EFREI - Rémi COHEN SCALI                                                                                     \n",
-  /* ===================================================================================================================== 5 = */
-  /*  == $ lisetchainee -A 1 -d                                                                                              = */
-  "Liste: 1\n",
-  /* ===================================================================================================================== 6 = */
-  /*  == $ lisetchainee -P 2 -d                                                                                              = */
-  "Liste: 2\n",
-  /* ===================================================================================================================== 7 = */
-  /*  == $ lisetchainee --append 3 --display                                                                                 = */
-  "Liste: 3\n",
-  /* ===================================================================================================================== 8 = */
-  /*  == $ lisetchainee --prepend 4 --display                                                                                = */
-  "Liste: 4\n",
-  /* ===================================================================================================================== 9 = */
-  /*  == $ lisetchainee -A 1 -P 2 -d                                                                                         = */
-  "Liste: 2,1\n",
-  /* ==================================================================================================================== 10 = */
-  /*  == $ lisetchainee --append 1 --prepend 2 --display                                                                     = */
-  "Liste: 2,1\n",
-  /* ==================================================================================================================== 11 = */
-  /*  == $ lisetchainee -v -A 1 -d                                                                                           = */
-  "listechainee: info: option 'v' was incremented for verbosity !\n"
-  "listechainee: info: option 'A' was called for appending '1' !\n"
-  "listechainee: info: appending '1'\n"
-  "listechainee: info: option 'd' was set !\n"
-  "listechainee: info: Displaying list\n"
-  "Liste: 1\n",
-  /* ==================================================================================================================== 12 = */
-  /*  == $ lisetchainee -v -P 2 -d                                                                                           = */
-  "listechainee: info: option 'v' was incremented for verbosity !\n"
-  "listechainee: info: option 'P' was called for prepending '2' !\n"
-  "listechainee: info: prepending '2'\n"
-  "listechainee: info: option 'd' was set !\n"
-  "listechainee: info: Displaying list\n"
-  "Liste: 2\n",
-  /* ==================================================================================================================== 13 = */
-  /*  == $ lisetchainee --verbose --append 3 --display                                                                       = */
-  "listechainee: info: option 'v' was incremented for verbosity !\n"
-  "listechainee: info: option 'A' was called for appending '3' !\n"
-  "listechainee: info: appending '3'\n"
-  "listechainee: info: option 'd' was set !\n"
-  "listechainee: info: Displaying list\n"
-  "Liste: 3\n",
-  /* ==================================================================================================================== 14 = */
-  /*  == $ lisetchainee --verbose --prepend 4 --display                                                                      = */
-  "listechainee: info: option 'v' was incremented for verbosity !\n"
-  "listechainee: info: option 'P' was called for prepending '4' !\n"
-  "listechainee: info: prepending '4'\n"
-  "listechainee: info: option 'd' was set !\n"
-  "listechainee: info: Displaying list\n"
-  "Liste: 4\n",
-  /* ==================================================================================================================== 15 = */
-  /*  == $ lisetchainee -v -A 1 -P 2 -d                                                                                      = */
-  "listechainee: info: option 'v' was incremented for verbosity !\n"
-  "listechainee: info: option 'A' was called for appending '1' !\n"
-  "listechainee: info: appending '1'\n"
-  "listechainee: info: option 'P' was called for prepending '2' !\n"
-  "listechainee: info: prepending '2'\n"
-  "listechainee: info: option 'd' was set !\n"
-  "listechainee: info: Displaying list\n"
-  "Liste: 2,1\n",
-  /* ==================================================================================================================== 16 = */
-  /*  == $ lisetchainee --verbose --append 1 --prepend 2 --display                                                           = */
-  "listechainee: info: option 'v' was incremented for verbosity !\n"
-  "listechainee: info: option 'A' was called for appending '1' !\n"
-  "listechainee: info: appending '1'\n"
-  "listechainee: info: option 'P' was called for prepending '2' !\n"
-  "listechainee: info: prepending '2'\n"
-  "listechainee: info: option 'd' was set !\n"
-  "listechainee: info: Displaying list\n"
-  "Liste: 2,1\n",
-  /* ==================================================================================================================== 17 = */
-  /*  == $ lisetchainee -v -A 1 -P 2 -d -s testlist1.l                                                                       = */
-  "listechainee: info: option 'v' was incremented for verbosity !\n"
-  "listechainee: info: option 'A' was called for appending '1' !\n"
-  "listechainee: info: appending '1'\n"
-  "listechainee: info: option 'P' was called for prepending '2' !\n"
-  "listechainee: info: prepending '2'\n"
-  "listechainee: info: option 'd' was set !\n"
-  "listechainee: info: Displaying list\n"
-  "Liste: 2,1\n"
-  "listechainee: info: option 's' was called for file 'testlist1.l' !\n"
-  "listechainee: info: Loading/Saving from/to filename 'testlist1.l'\n"
-  "listechainee: info: list was successfully saved to file 'testlist1.l'\n",
-  /* ==================================================================================================================== 18 = */
-  /*  == $ lisetchainee --verbose --append 1 --prepend 2 --display --save testlist1.l                                        = */
-  "listechainee: info: option 'v' was incremented for verbosity !\n"
-  "listechainee: info: option 'A' was called for appending '1' !\n"
-  "listechainee: info: appending '1'\n"
-  "listechainee: info: option 'P' was called for prepending '2' !\n"
-  "listechainee: info: prepending '2'\n"
-  "listechainee: info: option 'd' was set !\n"
-  "listechainee: info: Displaying list\n"
-  "Liste: 2,1\n"
-  "listechainee: info: option 's' was called for file 'testlist1.l' !\n"
-  "listechainee: info: Loading/Saving from/to filename 'testlist1.l'\n"
-  "listechainee: info: list was successfully saved to file 'testlist1.l'\n",
-  /* ==================================================================================================================== 19 = */
-  /*  == $ lisetchainee -v -l testlist1.l -d                                                                                 = */
-  "listechainee: info: option 'v' was incremented for verbosity !\n"
-  "listechainee: info: option 'l' was called for file 'testlist1.l' !\n"
-  "listechainee: info: Loading/Saving from/to filename 'testlist1.l'\n"
-  "listechainee: info: list was successfully loaded from file 'testlist1.l'\n"
-  "listechainee: info: option 'd' was set !\n"
-  "listechainee: info: Displaying list\n"
-  "Liste: 2,1\n",
-  /* ==================================================================================================================== 20 = */
-  /*  == $ lisetchainee -v -l testlist1.l -d                                                                                 = */
-  "listechainee: info: option 'v' was incremented for verbosity !\n"
-  "listechainee: info: option 'l' was called for file 'testlist1.l' !\n"
-  "listechainee: info: Loading/Saving from/to filename 'testlist1.l'\n"
-  "listechainee: info: list was successfully loaded from file 'testlist1.l'\n"
-  "listechainee: info: option 'd' was set !\n"
-  "listechainee: info: Displaying list\n"
-  "Liste: 2,1\n",
-  /* ==================================================================================================================== 21 = */
-  /*  == The End                                                                                                             = */
-  NULL
-  /*  ==                                                                                                      NB_TESTS == 22 = */
-};
+pid_t
+popen_dup_listechainee(int* fd_in, int* fd_out, int* fd_err, int nargs, ...)
+{
+  va_list ap;
+  pid_t childpid;
+  
+  int use_input_fd = (fd_in != (int*)NULL);
+  int use_output_fd = (fd_out != (int*)NULL);
+  int use_error_fd = (fd_err != (int*)NULL);
 
-#define TEST_COMMAND_ARGS_VS_RESULT_NB(args, nb)                    \
-  /* Initialize the buffer to \x00 */                               \
-  bzero((void*)buf, BUFFER_MAX_SIZE);                               \
-  /* Open the command with a pipe */                                \
-  FILE *fp = popen_listechainee(args);                              \
-  /* Read the command output with the pipe */                       \
-  fread(buf, BUFFER_MAX_SIZE-1, 1, fp);                             \
-  /* Test assertion */                                              \
-  CU_ASSERT(strncmp(buf, results[nb], strlen(results[nb])) == 0);   \
-  /* Close the pipe */                                              \
+  int fdin[2];
+  int fdout[2];
+  int fderr[2];
+  
+  char** args = (char**)malloc(nargs * sizeof(char*));
+  if (args == NULL)
+    return -1;
+
+  int n = nargs;
+
+  /* Get args for the launched command */
+  va_start(ap, nargs);
+  do
+    args[nargs - n] = va_arg(ap, char *);
+  while(--n);
+  va_end(ap);
+
+  /* Create our three pipes */
+  if (use_input_fd)
+    if (pipe2(fdin,  O_NONBLOCK) == -1) /* One for standard input */
+      return -1;
+  if (use_output_fd)
+    if (pipe2(fdout, 0) == -1)  /* One for standard output */ 
+      return -1;
+  if (use_error_fd)
+    if (pipe2(fderr, 0) == -1)  /* One for standard error */
+      return -1;
+  
+  /* Fork our process for launching the command */
+  if ((childpid = fork()) == -1)
+    {
+      perror("fork");
+      return -1;
+    }
+
+  /* If we are in parent process (launched command) */
+  if (childpid == 0)
+    {
+      if (use_input_fd)
+        {
+          /* Close unused read end of input pipe */
+          close(fdin[READ_PIPE_END]);
+          /* Copy as std input the in fd of the input pipe  */
+          *fd_in = fdin[WRITE_PIPE_END];          
+        }
+
+      if (use_output_fd)
+        {
+          /* Close unused write end of output pipe */
+          close(fdout[WRITE_PIPE_END]);
+          /* Copy as std output the out fd of the out pipe */
+          *fd_out = fdout[READ_PIPE_END];
+        }
+
+      if (use_error_fd)
+        {
+          /* Close unused write end of error pipe */
+          close(fderr[WRITE_PIPE_END]);
+          /* Copy as std error the out fd of the err pipe */
+          *fd_err = fderr[READ_PIPE_END];          
+        }
+    }
+  /* And in child */
+  else
+    {
+      /* Close file descr we do not need */
+      if (use_input_fd)
+        close(fdin[WRITE_PIPE_END]);  /* close write end of input pipe */
+      if (use_output_fd)
+        close(fdout[READ_PIPE_END]);  /* close read end of output pipe */
+      if (use_error_fd)
+        close(fderr[READ_PIPE_END]);  /* close read end of error pipe */
+
+      /* Setup our pipes ends as input/output for the child process */
+      if (use_input_fd)
+        {
+          close(STDIN_FILENO);          		  /* Close the standard input fd */
+          if (dup(fdin[READ_PIPE_END]) == -1)     /* And set as std input the read end fd from the input pipe */
+            {
+              perror("dup read end fd of input pipe");
+              return -1;
+            }
+        }
+      if (use_output_fd)
+        {
+          close(STDOUT_FILENO);                   /* Close the standard output fd */
+          if (dup(fdout[WRITE_PIPE_END]) == -1)   /* And set as std out the write end fd from the output pipe */          
+            {
+              perror("dup write end fd of output pipe");
+              return -1;
+            }
+        }
+      if (use_error_fd)
+        {
+          close(STDERR_FILENO);                   /* Finally close the standard error fd */
+          if (dup(fderr[WRITE_PIPE_END]) == -1)   /* And set as standard error the write end fd from the error pipe */          
+            {
+              perror("dup write end fd of error pipe");
+              return -1;
+            }
+        }
+
+      /* Exec the child command */
+      if (execv(args[0], args) == -1)
+        return -1;
+
+      /* Never reached */
+      while(1);
+    }
+  
+  /* Returns our FDs */
+  return childpid;
+}
+
+#define TEST_COMMAND_ARGS_VS_RESULT_NB(args, nb)                     \
+  /* Initialize the buffer to \x00 */                                \
+  bzero((void*)outbuf, BUFFER_MAX_SIZE);                             \
+  /* Open the command with a pipe */                                 \
+  FILE *fp = popen_listechainee(args);                               \
+  /* Read the command output with the pipe */                        \
+  int sz = fread(outbuf, BUFFER_MAX_SIZE-1, 1, fp);                  \
+  /* Test assertion */                                               \
+  CU_ASSERT(strncmp(outbuf,                                          \
+                    results[nb],                                     \
+                    strlen(results[nb])) == 0);                      \
+  /* Close the pipe */                                               \
   pclose(fp);
+
+#define TEST_COMMAND_ARGS_VS_IO_RES_NB_FULL(nbin, nbout, nberr, fdin, fdout, fderr, nbargs, ...)    \
+  pid_t childpid;                   /* Child process PID returned from fork */                      \
+  int wstatus;                      /* Status returned by the child process */                      \
+  int fds[3];                       /* Status returned by the child process */                      \
+  char* total_out = (char*)NULL;    /* Buffer for all output from child standard output */          \
+  char* total_err = (char*)NULL;    /* Buffer for all output from child standard error */           \
+  ssize_t out_sz, total_out_sz = 0; /* Size of data read from child output and total size */        \
+  ssize_t err_sz, total_err_sz = 0; /* Size of data read from child error and total size */         \
+                                                                                                    \
+  /* Init IOs fds */                                                                                \
+  fds[0] = fds[1] = fds[2] = -1;                                                                    \
+                                                                                                    \
+  /* Open the command with a pipe */                                                                \
+  childpid = popen_dup_listechainee(&fds[STDIN_FILENO],                                             \
+                                    &fds[STDOUT_FILENO],                                            \
+                                    (int*)NULL,                                                     \
+                                    3, command_pathname, "-N", (char*)NULL);                        \
+                                                                                                    \
+  /* Wait for child to terminate */                                                                 \
+  (void)waitpid(childpid, &wstatus, WNOHANG);                                                       \
+                                                                                                    \
+  /* Open files with piped fds */                                                                   \
+  FILE* fpin =  (FILE*)(fds[STDIN_FILENO]  == -1 ? NULL : fdopen(fds[STDIN_FILENO],  "w"));         \
+  FILE* fpout = (FILE*)(fds[STDOUT_FILENO] == -1 ? NULL : fdopen(fds[STDOUT_FILENO], "r"));         \
+  FILE* fperr = (FILE*)(fds[STDERR_FILENO] == -1 ? NULL : fdopen(fds[STDERR_FILENO], "r"));         \
+                                                                                                    \
+  /* Check if we need to inject some input to the child process */                                  \
+  if (fpin && instrs[2] != (char*)NULL)                                                             \
+    {                                                                                               \
+      fwrite(instrs[2], strlen(instrs[2]), 1, fpin);                                                \
+      /* flush the standard input of the child */                                                   \
+      fflush(fpin);                                                                                 \
+    }                                                                                               \
+                                                                                                    \
+  /* Read the command output with the pipe */                                                       \
+  if (fpout)                                                                                        \
+    do                                                                                              \
+      {                                                                                             \
+        /* Initialize the buffers to \x00 */                                                        \
+        bzero((void*)outbuf, BUFFER_MAX_SIZE);                                                      \
+                                                                                                    \
+        /* Read child command standard output */                                                    \
+        if ((out_sz = read(fileno(fpout), (void*)outbuf, BUFFER_MAX_SIZE-1)) == -1)                 \
+          {                                                                                         \
+            perror("Reading child process standard output");                                        \
+            return;                                                                                 \
+          }                                                                                         \
+        /* Read an amount of bytes */                                                               \
+        else if (out_sz > 0)                                                                        \
+          {                                                                                         \
+            /* If these are the first bytes read */                                                 \
+            if (!total_out_sz)                                                                      \
+              {                                                                                     \
+                total_out = (char*)malloc(out_sz+1);                                                \
+                total_out[out_sz] = 0;                                                              \
+                memcpy(total_out, outbuf, out_sz);                                                  \
+              }                                                                                     \
+            /* Else accumulate the bytes */                                                         \
+            else                                                                                    \
+              {                                                                                     \
+                total_out = (char*)realloc(total_out, total_out_sz+out_sz);                         \
+                memcpy(total_out+total_out_sz, outbuf, out_sz);                                     \
+              }                                                                                     \
+            /* Compute the total size of read bytes */                                              \
+            total_out_sz += out_sz;                                                                 \
+          }                                                                                         \
+      }                                                                                             \
+    while(out_sz > 0);                                                                              \
+                                                                                                    \
+  /* Read the command error with the pipe */                                                        \
+  if (fperr)                                                                                        \
+    do                                                                                              \
+      {                                                                                             \
+        /* Initialize the buffers to \x00 */                                                        \
+        bzero((void*)errbuf, BUFFER_MAX_SIZE);                                                      \
+                                                                                                    \
+        /* Read child command standard error */                                                     \
+        if ((err_sz = read(fileno(fperr), (void*)errbuf, BUFFER_MAX_SIZE-1)) == -1)                 \
+          {                                                                                         \
+            perror("Reading child process standard error");                                         \
+            return;                                                                                 \
+          }                                                                                         \
+        /* Read an amount of bytes */                                                               \
+        else if (err_sz > 0)                                                                        \
+          {                                                                                         \
+            /* If these are the first bytes read */                                                 \
+            if (!total_err_sz)                                                                      \
+              {                                                                                     \
+                total_err = (char*)malloc(err_sz+1);                                                \
+                total_err[err_sz] = 0;                                                              \
+                memcpy(total_err, errbuf, err_sz);                                                  \
+              }                                                                                     \
+            /* Else accumulate the bytes */                                                         \
+            else                                                                                    \
+              {                                                                                     \
+                total_err = (char*)realloc(total_err, total_err_sz+err_sz);                         \
+                memcpy(total_err+total_err_sz, errbuf, err_sz);                                     \
+              }                                                                                     \
+            /* Compute the total size of read bytes */                                              \
+            total_err_sz += err_sz;                                                                 \
+          }                                                                                         \
+      }                                                                                             \
+    while(err_sz > 0);                                                                              \
+                                                                                                    \
+  /* Test assertions */                                                                             \
+  if (fpout)                                                                                        \
+    {                                                                                               \
+      if (strncmp(total_out, results[42], strlen(results[42])) != 0)                                \
+        fprintf(stdout, "\n%s\n", total_out);                                                       \
+      CU_ASSERT(strncmp(total_out, results[42], strlen(results[42])) == 0);                         \
+      free((void*)total_out);                                                                       \
+    }                                                                                               \
+  if (fperr)                                                                                        \
+    {                                                                                               \
+      if (strncmp(total_err, errres[-1], strlen(errres[-1])) != 0)                                  \
+        fprintf(stdout, "\n%s\n", total_err);                                                       \
+      CU_ASSERT(strncmp(total_err, errres[-1],  strlen(errres[-1]))  == 0);                         \
+      free((void*)total_err);                                                                       \
+    }                                                                                               \
+                                                                                                    \
+  /* Close the pipes */                                                                             \
+  if (fpin)  fclose(fpin);                                                                          \
+  if (fpout) fclose(fpout);                                                                         \
+  if (fperr) fclose(fperr);
 
 /*
  * test_command_basic_invocation_0
@@ -331,7 +376,9 @@ char* results[NB_TESTS] = {
 void
 test_command_basic_invocation_0(void)
 {
-  TEST_COMMAND_ARGS_VS_RESULT_NB("", 0);
+  TEST_COMMAND_ARGS_VS_IO_RES_NB_FULL(-1, 0, 0,
+                                      (int*)NULL, &fds[STDOUT_FILENO], &fds[STDERR_FILENO],
+                                      2, command_pathname, (char*)NULL);
 }
 
 /*
@@ -342,7 +389,9 @@ test_command_basic_invocation_0(void)
 void
 test_command_basic_invocation_v(void)
 {
-  TEST_COMMAND_ARGS_VS_RESULT_NB("-v", 1);
+  TEST_COMMAND_ARGS_VS_IO_RES_NB_FULL(-1, 1, 0,
+                                      (int*)NULL, &fds[STDOUT_FILENO], &fds[STDERR_FILENO],
+                                      3, command_pathname, "-v", (char*)NULL);
 }
 
 /*
@@ -353,7 +402,9 @@ test_command_basic_invocation_v(void)
 void
 test_command_basic_invocation_vh(void)
 {
-  TEST_COMMAND_ARGS_VS_RESULT_NB("-v -h", 2);
+  TEST_COMMAND_ARGS_VS_IO_RES_NB_FULL(-1, 2, 0,
+                                      (int*)NULL, &fds[STDOUT_FILENO], &fds[STDERR_FILENO],
+                                      4, command_pathname, "-v", "-h", (char*)NULL);
 }
 
 /*
@@ -364,7 +415,9 @@ test_command_basic_invocation_vh(void)
 void
 test_command_basic_invocation_verbose(void)
 {
-  TEST_COMMAND_ARGS_VS_RESULT_NB("--verbose", 3);
+  TEST_COMMAND_ARGS_VS_IO_RES_NB_FULL(-1, 3, 0,
+                                      (int*)NULL, &fds[STDOUT_FILENO], &fds[STDERR_FILENO],
+                                      3, command_pathname, "--verbose", (char*)NULL);
 }
 
 /*
@@ -375,7 +428,9 @@ test_command_basic_invocation_verbose(void)
 void
 test_command_basic_invocation_verbose_help(void)
 {
-  TEST_COMMAND_ARGS_VS_RESULT_NB("--verbose --help", 4);  
+  TEST_COMMAND_ARGS_VS_IO_RES_NB_FULL(-1, 4, 0,
+                                      (int*)NULL, &fds[STDOUT_FILENO], &fds[STDERR_FILENO],
+                                      4, command_pathname, "--verbose", "--help", (char*)NULL);
 }
 
 /*
@@ -536,7 +591,7 @@ test_command_basic_invocation_vA1P2ds_testlist1_l(void)
       /* Buffer for reading file content */
       char buflist[LIST_BUFFER_SIZE];
       /* Read list file content */
-      size_t listlen = fread(buflist, LIST_BUFFER_SIZE-1, 1, datafp);
+      size_t listlen = read(fileno(datafp), (void*)buflist, LIST_BUFFER_SIZE-1);
       /* Assert the list content */
       CU_ASSERT(strncmp("2,1", buflist, listlen) == 0);
     }
@@ -569,7 +624,7 @@ test_command_basic_invocation_verbose_append_1_prepend_2_display_save_testlist1_
       /* Buffer for reading file content */
       char buflist[LIST_BUFFER_SIZE];
       /* Read list file content */
-      size_t listlen = fread(buflist, LIST_BUFFER_SIZE-1, 1, datafp);
+      size_t listlen = read(fileno(datafp), (void*)buflist, LIST_BUFFER_SIZE-1);
       /* Assert the list content */
       CU_ASSERT(strncmp("2,1", buflist, listlen) == 0);
     }
@@ -597,3 +652,262 @@ test_command_basic_invocation_verbose_load_testlist1_l_display(void)
 {
   TEST_COMMAND_ARGS_VS_RESULT_NB("--verbose --load testlist1.l --display", 20); 
 }
+
+/*
+ * test_command_basic_invocation_vl_testlist1_notfound_l_d
+ *
+ * Basic tests for the command invocation with '-v -l testlist1-notfound.l -d' args
+ */
+void
+test_command_basic_invocation_vl_testlist1_notfound_l_d(void)
+{
+  TEST_COMMAND_ARGS_VS_IO_RES_NB_FULL(-1, 21, 1,
+                                      (int*)NULL, &fds[STDOUT_FILENO], &fds[STDERR_FILENO],
+                                      6, command_pathname, "-v", "-l", "testlist1-notfound.l", "-d", (char*)NULL);
+}
+
+/*
+ * test_command_basic_invocation_verbose_load_testlist1_notfound_l_display
+ *
+ * Basic tests for the command invocation with '--verbose --load testlist1-notfound.l --display' args
+ */
+void
+test_command_basic_invocation_verbose_load_testlist1_notfound_l_display(void)
+{
+  TEST_COMMAND_ARGS_VS_IO_RES_NB_FULL(-1, 22, 2,
+                                      (int*)NULL, &fds[STDOUT_FILENO], &fds[STDERR_FILENO],
+                                      6, command_pathname, "--verbose", "--load", "testlist1-notfound.l", "--display", (char*)NULL);
+}
+
+/*
+ * test_command_basic_invocation_A1A2A3dr1dP4dr2dr4dr3dr3d
+ *
+ * Basic tests for the command invocation with '-A 1 -A 2 -A 3 -d -r 1 -d -P 4 -d -r 2 -d -r 4 -d -r 3 -d -r 3 -d' args
+ */
+void
+test_command_basic_invocation_A1A2A3dr1dP4dr2dr4dr3dr3d(void)
+{
+  TEST_COMMAND_ARGS_VS_RESULT_NB("-A 1 -A 2 -A 3 -d -r 1 -d -P 4 -d -r 2 -d -r 4 -d -r 3 -d -r 3 -d", 23); 
+}
+
+/*
+ * test_command_basic_invocation_A1A2A3dI41d
+ *
+ * Basic tests for the command invocation with '-A 1 -A 2 -A 3 -d -I 4,1 -d' args
+ */
+void
+test_command_basic_invocation_A1A2A3dI41d(void)
+{
+  TEST_COMMAND_ARGS_VS_RESULT_NB("-A 1 -A 2 -A 3 -d -I4,1 -d", 24); 
+}
+
+/*
+ * test_command_basic_invocation_A1A2A3dI42d
+ *
+ * Basic tests for the command invocation with '-A 1 -A 2 -A 3 -d -I 4,2 -d' args
+ */
+void
+test_command_basic_invocation_A1A2A3dI42d(void)
+{
+  TEST_COMMAND_ARGS_VS_RESULT_NB("-A 1 -A 2 -A 3 -d -I4,2 -d", 25); 
+}
+
+/*
+ * test_command_basic_invocation_A1A2A3dI43d
+ *
+ * Basic tests for the command invocation with '-A 1 -A 2 -A 3 -d -I 4,3 -d' args
+ */
+void
+test_command_basic_invocation_A1A2A3dI43d(void)
+{
+  TEST_COMMAND_ARGS_VS_RESULT_NB("-A 1 -A 2 -A 3 -d -I4,3 -d", 26); 
+}
+
+/*
+ * test_command_basic_invocation_A1A2A3dI44d
+ *
+ * Basic tests for the command invocation with '-A 1 -A 2 -A 3 -d -I 4,4 -d' args
+ */
+void
+test_command_basic_invocation_A1A2A3dI44d(void)
+{
+  TEST_COMMAND_ARGS_VS_RESULT_NB("-A 1 -A 2 -A 3 -d -I4,4 -d", 27); 
+}
+
+/*
+ * test_command_basic_invocation_A1A2A3dI12d
+ *
+ * Basic tests for the command invocation with '-A 1 -A 2 -A 3 -d -I 1,2 -d' args
+ */
+void
+test_command_basic_invocation_A1A2A3dI12d(void)
+{
+  TEST_COMMAND_ARGS_VS_RESULT_NB("-A 1 -A 2 -A 3 -d -I1,2 -d", 28); 
+}
+
+/*
+ * test_command_basic_invocation_A1A2A3dI4plus0d
+ *
+ * Basic tests for the command invocation with '-A 1 -A 2 -A 3 -d -I 4,+0 -d' args
+ */
+void
+test_command_basic_invocation_A1A2A3dI4plus0d(void)
+{
+  TEST_COMMAND_ARGS_VS_RESULT_NB("-A 1 -A 2 -A 3 -d -I4,+0 -d", 29); 
+}
+
+/*
+ * test_command_basic_invocation_A1A2A3dI4plus1d
+ *
+ * Basic tests for the command invocation with '-A 1 -A 2 -A 3 -d -I 4,+1 -d' args
+ */
+void
+test_command_basic_invocation_A1A2A3dI4plus1d(void)
+{
+  TEST_COMMAND_ARGS_VS_RESULT_NB("-A 1 -A 2 -A 3 -d -I4,+1 -d", 30); 
+}
+
+/*
+ * test_command_basic_invocation_A1A2A3dI4plus2d
+ *
+ * Basic tests for the command invocation with '-A 1 -A 2 -A 3 -d -I 4,+2 -d' args
+ */
+void
+test_command_basic_invocation_A1A2A3dI4plus2d(void)
+{
+  TEST_COMMAND_ARGS_VS_RESULT_NB("-A 1 -A 2 -A 3 -d -I4,+2 -d", 31); 
+}
+
+/*
+ * test_command_basic_invocation_A1A2A3dI4plus3d
+ *
+ * Basic tests for the command invocation with '-A 1 -A 2 -A 3 -d -I 4,+3 -d' args
+ */
+void
+test_command_basic_invocation_A1A2A3dI4plus3d(void)
+{
+  TEST_COMMAND_ARGS_VS_RESULT_NB("-A 1 -A 2 -A 3 -d -I4,+3 -d", 32); 
+}
+/*
+ * test_command_basic_invocation_A1A2A3dI1plus0d
+ *
+ * Basic tests for the command invocation with '-A 1 -A 2 -A 3 -d -I 1,+0 -d' args
+ */
+void
+test_command_basic_invocation_A1A2A3dI1plus0d(void)
+{
+  TEST_COMMAND_ARGS_VS_RESULT_NB("-A 1 -A 2 -A 3 -d -I1,+0 -d", 33); 
+}
+
+/*
+ * test_command_basic_invocation_l_testlist1_l_dt1t2t3
+ *
+ * Basic tests for the command invocation with '-l testlist1.l -d -t 1 -t 2 -t 3' args
+ */
+void
+test_command_basic_invocation_l_testlist1_l_dt1t2t3(void)
+{
+  TEST_COMMAND_ARGS_VS_RESULT_NB("-l testlist1.l -d -t 1 -t 2 -t 3", 34); 
+}
+
+/*
+ * test_command_basic_invocation_vl_testlist1_l_dt1t2t3
+ *
+ * Basic tests for the command invocation with '-v -l testlist1.l -d -t 1 -t 2 -t 3' args
+ */
+void
+test_command_basic_invocation_vl_testlist1_l_dt1t2t3(void)
+{
+  TEST_COMMAND_ARGS_VS_RESULT_NB("-v -l testlist1.l -d -t 1 -t 2 -t 3", 35); 
+}
+
+/*
+ * test_command_basic_invocation_l_testlist1_l_A1dr2d
+ *
+ * Basic tests for the command invocation with '-l testlist1.l -A 3 -d -r 2 -d' args
+ */
+void
+test_command_basic_invocation_l_testlist1_l_A1dr2d(void)
+{
+  TEST_COMMAND_ARGS_VS_RESULT_NB("-l testlist1.l -A 3 -d -r 2 -d", 36);
+}
+
+/*
+ * test_command_basic_invocation_l_testlist1_l_A1dr1d
+ *
+ * Basic tests for the command invocation with '-l testlist1.l -A 3 -d -r 1 -d' args
+ */
+void
+test_command_basic_invocation_l_testlist1_l_A1dr1d(void)
+{
+  TEST_COMMAND_ARGS_VS_RESULT_NB("-l testlist1.l -A 3 -d -r 1 -d", 37);
+}
+
+/*
+ * test_command_basic_invocation_l_testlist1_l_A1dr3d
+ *
+ * Basic tests for the command invocation with '-l testlist1.l -A 3 -d -r 3 -d' args
+ */
+void
+test_command_basic_invocation_l_testlist1_l_A1dr3d(void)
+{
+  TEST_COMMAND_ARGS_VS_RESULT_NB("-l testlist1.l -A 3 -d -r 3 -d", 38);
+}
+
+/*
+ * test_command_basic_invocation_l_testlist1_l_A1dr4d
+ *
+ * Basic tests for the command invocation with '-l testlist1.l -A 3 -d -r 4 -d' args
+ */
+void
+test_command_basic_invocation_l_testlist1_l_A1dr4d(void)
+{
+  TEST_COMMAND_ARGS_VS_RESULT_NB("-l testlist1.l -A 3 -d -r 4 -d", 39);
+}
+
+/*
+ * test_command_menu_invocation_append_display
+ *
+ * Basic tests for the command menu invocation with '-N' args
+ * then send 'f \n 1 \n f \n 2 \n a \n q \n' on standard input
+ */
+void
+test_command_menu_invocation_append_display(void)
+{
+  TEST_COMMAND_ARGS_VS_IO_RES_NB_FULL(0, 40, -1,
+                                      &fds[STDIN_FILENO], &fds[STDOUT_FILENO], (int*)NULL,
+                                      3, command_pathname, "-N", (char*)NULL);
+}
+
+/*
+ * test_command_menu_invocation_help_quit
+ *
+ * Basic tests for the command menu invocation with '-N' args
+ * then send 'm \n q \n' on standard input
+ */
+void
+test_command_menu_invocation_help_quit(void)
+{
+  TEST_COMMAND_ARGS_VS_IO_RES_NB_FULL(1, 41, -1,
+                                      &fds[STDIN_FILENO], &fds[STDOUT_FILENO], (int*)NULL,
+                                      3, command_pathname, "-N", (char*)NULL);
+}
+
+/*
+ * test_command_menu_invocation_load_insert_x_2_display_quit
+ *
+ * Basic tests for the command menu invocation with '-N' args
+ * then send 'c \n testmenu.l \n a \n h \n 4 \n 1 \n a \n h \n 5 \n 3 \n a \n q \n' on standard input
+ */
+void
+test_command_menu_invocation_load_insert_x_2_display_quit(void)
+{
+  TEST_COMMAND_ARGS_VS_IO_RES_NB_FULL(1, 41, -1,
+                                      &fds[STDIN_FILENO], &fds[STDOUT_FILENO], (int*)NULL,
+                                      3, command_pathname, "-N", (char*)NULL);
+}
+
+/**
+ * vim: et:ts=4:sw=4:sts=4																																				   
+ * -*- mode: C; coding: utf-8-unix; tab-width: 4; tab-always-indent: t; tab-first-completion: nil -*-
+ */

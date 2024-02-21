@@ -49,7 +49,7 @@ test_ix_in_list_with_list_null(void)
 {
   /* Add ix 0 in null list is ok */
   CU_ASSERT(test_ix_in_list((listechainee_ptr)NULL, -1) == 0);
-  CU_ASSERT(test_ix_in_list((listechainee_ptr)NULL, 0) == 1);
+  CU_ASSERT(test_ix_in_list((listechainee_ptr)NULL, 0) == 0);
   CU_ASSERT(test_ix_in_list((listechainee_ptr)NULL, 1) == 0);
   CU_ASSERT(test_ix_in_list((listechainee_ptr)NULL, 2) == 0);
 }
@@ -70,7 +70,7 @@ test_ix_in_list_with_list_with_ix(void)
   /* Assert test conditions */
   CU_ASSERT(test_ix_in_list(list, -1) == 0);
   CU_ASSERT(test_ix_in_list(list, 0) == 1);
-  CU_ASSERT(test_ix_in_list(list, 1) == 1);
+  CU_ASSERT(test_ix_in_list(list, 1) == 0);
   CU_ASSERT(test_ix_in_list(list, 2) == 0);
   /* Free list */
   free((void*)list);
@@ -96,7 +96,7 @@ test_ix_in_list_with_list_without_ix(void)
   CU_ASSERT(test_ix_in_list(list, -1) == 0);  
   CU_ASSERT(test_ix_in_list(list, 0) == 1);  
   CU_ASSERT(test_ix_in_list(list, 1) == 1);  
-  CU_ASSERT(test_ix_in_list(list, 2) == 1);  
+  CU_ASSERT(test_ix_in_list(list, 2) == 0);  
   CU_ASSERT(test_ix_in_list(list, 3) == 0);
   /* Free list */
   free((void*)list->next);
@@ -306,3 +306,8 @@ test_prepend_list_with_list_non_null(void)
   /* free memory */
   free_list(list);
 }
+
+/**
+ * vim: et:ts=4:sw=4:sts=4																																				   
+ * -*- mode: C; coding: utf-8-unix; tab-width: 4; tab-always-indent: t; tab-first-completion: nil -*-
+ */

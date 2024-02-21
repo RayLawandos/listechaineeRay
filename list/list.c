@@ -10,7 +10,6 @@
 
 #include "list/list.h"
 
-#define ERR_MESSAGE_MAX_SIZE 	1024
 #define BUFFER_MAX_SIZE 		  20
 
 /* Extern decl of current listechainee */
@@ -30,10 +29,14 @@ extern char* progname;
 void
 free_list(listechainee_ptr list)
 {
+  /* Browse all list nodes */
   while(list)
     {
+      /* Get a tmp ptr for the current node */
       listechainee_ptr tmp = list;
+      /* Move head of the list to the next node */
       list = list->next;
+      /* Free the current node */
       free(tmp);
     }
 }
@@ -51,8 +54,11 @@ free_list(listechainee_ptr list)
 void
 init_list(void)
 {
+  /* If current list not empty */
   if (curlist != NULL)
+    /* Free the list */
     free_list(curlist);
+  /* Set current list as empty */
   curlist = NULL;
 }
 
@@ -69,7 +75,9 @@ init_list(void)
 listechainee_ptr
 reinit_list(listechainee_ptr list)
 {
+  /* Init the list to an empty one */
   init_list();
+  /* set current list and returns it */
   return (curlist = list);
 }
 
@@ -86,19 +94,28 @@ reinit_list(listechainee_ptr list)
 void
 display_list(listechainee_ptr list)
 {
-  if (list == NULL)
-    fprintf(stdout, "Liste vide\n");
+  /* If list is empty */
+  if (list == (listechainee_ptr)NULL)
+    /* Displays it */
+    fprintf(stdout, "Empty list\n");
   else
     {
-      fprintf(stdout, "Liste: ");
+      /* Print the list */
+      fprintf(stdout, "List: [");
+      /* For each list element */
       while(list)
         {
+          /* print element */
           fprintf(stdout, "%d", list->N);
+          /* If not at end of list */
           if (list->next)
+            /* Displays the comma */
             fprintf(stdout, ",");
+          /* Switch to the next node */
           list = list->next;
         }
-      fprintf(stdout, "\n");
+      /* Close the display of the list */
+      fprintf(stdout, "]\n");
     }
 }
 
@@ -122,15 +139,9 @@ load_list(char* filename)
   FILE *fp = fopen(filename, "r");
   /* File opening failed */
   if (fp == (FILE*)NULL)
-    {
-      /* Format the error message */
-      char errmesg[ERR_MESSAGE_MAX_SIZE];
-      snprintf(errmesg, ERR_MESSAGE_MAX_SIZE-1, "error: loading list from file '%s'", filename);
-      /* Displays it */
-      perror(errmesg);
       /* Return an error */
       return NULL;
-    }
+
   /* File opened successfully */
   else
     {
@@ -182,15 +193,9 @@ save_list(listechainee_ptr list, char* filename)
   FILE *fp = fopen(filename, "w");
   /* If file didn't opened successfully */
   if (fp == (FILE *)NULL)
-    {
-      /* Format error message */
-      char errmesg[ERR_MESSAGE_MAX_SIZE];
-      snprintf(errmesg, ERR_MESSAGE_MAX_SIZE-1, "error: loading list from file '%s'", filename);
-      /* And displays it */
-      perror(errmesg);
       /* Returns error */
       return NULL;
-    }
+
   /* File opened successfully */
   else
     {
@@ -230,19 +235,20 @@ save_list(listechainee_ptr list, char* filename)
 int
 test_elem_in_list(listechainee_ptr list, int n)
 {
-  /* Browse the list */
+  /* Take head of list */
   listechainee_ptr tmp = list;
+  /* Browse the list */
   while(tmp)
     {
       /* If element was found */
       if (tmp->N == n)
         /* Returns success */
-        return 1;
+        return TRUE;
       /* Next element */
       tmp = tmp->next;
     }
   /* Returns failure */
-  return 0;
+  return FALSE;
 }
 
 /*
@@ -263,25 +269,27 @@ test_ix_in_list(listechainee_ptr list, int ix)
   /* If ix not positive or null */
   if (ix < 0)
     /* returns No */
-    return 0;
+    return FALSE;
   /* Local index */
-  int lix = 1;
+  int lix = -1;
   /* Temp node ptr */
   listechainee_ptr tmp = list;
   /* Browse the list */
   while(tmp)
     {
+      /* Incr local index (next one) */
+      lix++;
+
       /* If index is found */
       if (lix == ix)
         /* Return Yes */
-        return 1;
+        return TRUE;
       /* Goes on next node */
       tmp = tmp->next;
-      /* Incr local index (next one) */
-      lix++;
     }
-  /* If index was null it is always available else return No */
-  return ix == 0 ? 1 : 0;
+
+  /* Not found */
+  return FALSE;
 }
 
 /*
@@ -298,27 +306,40 @@ test_ix_in_list(listechainee_ptr list, int ix)
 listechainee_ptr
 append_list(listechainee_ptr list, int n)
 {
+  /* Test that element not already in the list */
   if (test_elem_in_list(list, n))
+    /* If yes, returns NULL */
     return NULL;
   
+  /* Allocate new node */
   listechainee_ptr new_node = (listechainee_ptr)malloc(sizeof(struct listechainee_st));
+  /* Init new node value */
   new_node->N = n;
   new_node->next = (listechainee_ptr)NULL;
+  /* If list is empty */
   if (list == NULL)
-    {
-      list = new_node;
-    }
+    /* Set the new node as the new list */
+    list = new_node;
+
   else
     {
+      /* Get a ptr to current node (at head) */
       listechainee_ptr tmp = list;
+      /* While not at end of list */
       while(tmp)
         {
+          /* If at tail of list */
           if (tmp->next == NULL)
+            /* Exits loop */
             break;
+          /* Advance to the next node */
           tmp = tmp->next;
         }
+      /* Link the new node as tail of list */
       tmp->next = new_node;
     }
+
+  /* Returns list */
   return list;  
 }
 
@@ -336,15 +357,20 @@ append_list(listechainee_ptr list, int n)
 listechainee_ptr 
 prepend_list(listechainee_ptr list, int n)
 {
+  /* Test that element not already in the list */
   if (test_elem_in_list(list, n))
+    /* If yes, returns NULL */
     return NULL;
-  
-  listechainee_ptr new_node = (listechainee_ptr)malloc(sizeof(struct listechainee_st));
-  new_node->N = n;
-  new_node->next = list;
-  list = new_node;
 
-  return list;
+  /* Allocate new node */
+  listechainee_ptr new_node = (listechainee_ptr)malloc(sizeof(struct listechainee_st));
+  /* Init new node value */
+  new_node->N = n;
+  /* Linked the list as tail of new node */
+  new_node->next = list;
+
+  /* Returns the new node */
+  return new_node;
 }
 
 /*
@@ -390,7 +416,7 @@ insert_elem_in_list(listechainee_ptr list, int ix, int n)
                   /* New node is the new list */
                   newn->next = tmp->next;
                   /* Then returns it */
-                  return newn;
+                  list->next = newn;
                 }
               /* Insert in the list (after the first element) */
               else
@@ -399,9 +425,8 @@ insert_elem_in_list(listechainee_ptr list, int ix, int n)
                   newn->next = tmp->next;
                   /* Insert new node */
                   tmp->next = newn;
-                  /* Returns list */
-                  return list;                  
                 }
+              break;
             }
           /* Goes on to next node */
           tmp = tmp->next;
@@ -409,26 +434,161 @@ insert_elem_in_list(listechainee_ptr list, int ix, int n)
           lix++;
         }      
     }
-  else
-    /* returns NULL: cannot insert */
-    return(NULL);
+
+  return list;
 }
 
-void
+int
+find_elem_ix(listechainee_ptr list, int n)
+{
+  int ix = -1;
+
+  /* Take head of list */
+  listechainee_ptr tmp = list;
+  /* Browse the list */
+  while(tmp)
+    {
+      ix++;
+      /* If element was found */
+      if (tmp->N == n)
+        /* Returns success */
+        return ix;
+      /* Next element */
+      tmp = tmp->next;
+    }
+  
+  return -1;
+}
+
+/*
+ * delete_end_of_list
+ *
+ * Delete tail of the list
+ * params:
+ *  list - in: the list in which to remove tail
+ * returns:
+ *  The list or NULL if list empty
+ */
+listechainee_ptr
 delete_end_of_list(listechainee_ptr list)
 {
-  
+    listechainee_ptr tmp = list;
+
+  /* If list not empty and has more than 1 element */
+  if (tmp && tmp->next)
+    {
+      /* Find the end of list */
+      while (tmp && tmp->next)
+        {
+          /* If end of list found */
+          if (tmp->next && tmp->next->next == (listechainee_ptr)NULL)
+            {
+              /* Free it and exit loop */
+              free((void*)tmp->next);
+              tmp->next = (listechainee_ptr)NULL;
+              break;
+            }
+
+          /* Move to the next node */
+          tmp = tmp->next;
+        }
+    }
+  /* If list is not empty but has only 1 element */
+  else if (list && !list->next)
+    {
+      /* Free it */
+      free(list);
+      /* and return an empty list */
+      list = (listechainee_ptr)NULL;
+    }
+
+  return list;
 }
 
+/*
+ * delete_start_of_list
+ *
+ * Delete head of the list
+ * params:
+ *  list - in: list in which to remove head from
+ * returns:
+ *  The list or NULL if list empty
+ */
 listechainee_ptr
 delete_start_of_list(listechainee_ptr list)
 {
-  
+  listechainee_ptr tmp = (listechainee_ptr)NULL;
+  if (list)
+    {      
+      tmp = list->next;
+      free((void*)list);
+    }
+  return tmp;
 } 
 
+/*
+ * delete_elem_in_list
+ *
+ * Delete an element from the list provided as parameter
+ * params:
+ *  list - in: the list in which to remove an element from
+ *  n    - in: the element to remove
+ * returns:
+ *  list or NULL if list empty
+ */
 listechainee_ptr
-delete_elem_in_list(listechainee_ptr list, int ix)
+delete_elem_in_list(listechainee_ptr list, int n)
 {
-  
+  /* Test that element is in list */
+  if (test_elem_in_list(list, n))
+  {
+    /* If first element to remove */
+    if (list->N == n)
+      {
+        /* keep ptr to head for freeing */
+        listechainee_ptr head = list;
+        /* Change head of list */
+        list = list->next;
+        /* Free node */
+        free((void*)head);
+      }
+    else
+      {
+        /* Keep ptr to the previous node */
+        listechainee_ptr prev = (listechainee_ptr)NULL;
+        /* Get a ptr to the current node */
+        listechainee_ptr ptr = list;
+        /* Search the node to remove: while not found ... */
+        while(ptr && ptr->N != n)
+          {
+            /* Move previous node */
+            prev = ptr;
+            /* Get next node */
+            ptr = ptr->next;
+          }
+        /* If the node to remove was found */
+        if (ptr->N == n)
+          {
+            /* If the previous node is available */
+            if (prev != NULL)
+              /* Unlink the node to remove by linking prev to the found node next ptr */
+              prev->next = ptr->next;
+            else
+              /* Set the head of the list as the found node next ptr */
+              list = ptr->next;
+
+            /* Free the found node */
+            free((void*)ptr);
+          }
+      }
+  }
+
+  /* Return the list (if head has been removed) */
+  return list;
 }
 
+
+/**
+ * vim: et:ts=4:sw=4:sts=4																																				   
+ * -*- mode: C; coding: utf-8-unix; tab-width: 4; tab-always-indent: t; tab-first-completion: nil -*-
+ */

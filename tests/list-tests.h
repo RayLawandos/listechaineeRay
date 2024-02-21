@@ -19,3 +19,8 @@ void test_append_list_with_list_null(void);
 void test_append_list_with_list_non_null(void);
 void test_prepend_list_with_list_null(void);
 void test_prepend_list_with_list_non_null(void);
+
+/**
+ * vim: et:ts=4:sw=4:sts=4																																				   
+ * -*- mode: C; coding: utf-8-unix; tab-width: 4; tab-always-indent: t; tab-first-completion: nil -*-
+ */
