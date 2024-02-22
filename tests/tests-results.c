@@ -44,7 +44,7 @@
  * The menu of the interactive command
  */
 #define MENU_MESSAGE                                                \
-    "Menu:\n"                                                       \
+    "\nMenu:\n"                                                     \
     "----:\n"                                                       \
     "     a) Display current list\n"                                \
     "     b) Reset/Init current list\n"                             \

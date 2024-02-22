@@ -593,7 +593,7 @@ test_command_basic_invocation_vA1P2ds_testlist1_l(void)
       /* Read list file content */
       size_t listlen = read(fileno(datafp), (void*)buflist, LIST_BUFFER_SIZE-1);
       /* Assert the list content */
-      CU_ASSERT(strncmp("2,1", buflist, listlen) == 0);
+      CU_ASSERT(strncmp("2,1\n", buflist, listlen) == 0);
     }
   return;
 }
@@ -626,7 +626,7 @@ test_command_basic_invocation_verbose_append_1_prepend_2_display_save_testlist1_
       /* Read list file content */
       size_t listlen = read(fileno(datafp), (void*)buflist, LIST_BUFFER_SIZE-1);
       /* Assert the list content */
-      CU_ASSERT(strncmp("2,1", buflist, listlen) == 0);
+      CU_ASSERT(strncmp("2,1\n", buflist, listlen) == 0);
     }
   return;
 }
