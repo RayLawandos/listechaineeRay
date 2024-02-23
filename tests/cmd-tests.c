@@ -8,6 +8,8 @@
 #define _GNU_SOURCE
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/wait.h>
+#include <sys/types.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -15,9 +17,11 @@
 #include <unistd.h>
 #include <stdarg.h>
 #include <fcntl.h> 
+#include <errno.h>
 
-#include <sys/wait.h>
-#include <sys/types.h>
+extern int errno;
+extern int sys_nerr;
+extern const char * const sys_errlist[];
 
 #include <CUnit/Basic.h>
 
@@ -108,40 +112,52 @@ popen_listechainee(char* args)
 pid_t
 popen_dup_listechainee(int* fd_in, int* fd_out, int* fd_err, int nargs, ...)
 {
-  va_list ap;
-  pid_t childpid;
+  va_list ap;			/* arg ptr: variable argument list */
+  pid_t childpid;		/* childpid: child process ID */
+  int n = nargs;		/* n: number of arguments for command */
   
-  int use_input_fd = (fd_in != (int*)NULL);
-  int use_output_fd = (fd_out != (int*)NULL);
-  int use_error_fd = (fd_err != (int*)NULL);
+  int use_input_fd = (fd_in != (int*)NULL);		/* If an input fd is provided use it */
+  int use_output_fd = (fd_out != (int*)NULL);	/* If an output fd is provided use it */
+  int use_error_fd = (fd_err != (int*)NULL);	/* If an error fd is provided use it */
 
-  int fdin[2];
-  int fdout[2];
-  int fderr[2];
-  
+  int fdin[2];			/* Input pipe */
+  int fdout[2];			/* Output pipe */
+  int fderr[2];			/* Error pipe */
+
+  /* Allocate memory for storing command arguments */
   char** args = (char**)malloc(nargs * sizeof(char*));
   if (args == NULL)
-    return -1;
+    {
+      perror("allocate memory for command arguments");
+      return -1;
+    }
 
-  int n = nargs;
-
-  /* Get args for the launched command */
+  /* Get args for the launched command and store them in args table */
   va_start(ap, nargs);
   do
     args[nargs - n] = va_arg(ap, char *);
   while(--n);
   va_end(ap);
 
-  /* Create our three pipes */
+  /* Create our three pipes: input, output and error */
   if (use_input_fd)
     if (pipe2(fdin,  O_NONBLOCK) == -1) /* One for standard input */
-      return -1;
+      {
+        perror("create input pipe");
+        return -1;          
+      }
   if (use_output_fd)
     if (pipe2(fdout, 0) == -1)  /* One for standard output */ 
-      return -1;
+      {
+        perror("create output pipe");
+        return -1;          
+      }
   if (use_error_fd)
     if (pipe2(fderr, 0) == -1)  /* One for standard error */
-      return -1;
+      {
+        perror("create error pipe");
+        return -1;          
+      }
   
   /* Fork our process for launching the command */
   if ((childpid = fork()) == -1)
@@ -150,9 +166,13 @@ popen_dup_listechainee(int* fd_in, int* fd_out, int* fd_err, int nargs, ...)
       return -1;
     }
 
-  /* If we are in parent process (launched command) */
+  /* If we are in child process */
   if (childpid == 0)
     {
+      /*
+       * We want to use the input pipe for the parent process to send
+       * data to the child process (it read on std in)
+       */
       if (use_input_fd)
         {
           /* Close unused read end of input pipe */
@@ -161,6 +181,10 @@ popen_dup_listechainee(int* fd_in, int* fd_out, int* fd_err, int nargs, ...)
           *fd_in = fdin[WRITE_PIPE_END];          
         }
 
+      /*
+       * We want to use the output pipe for the parent process to receive
+       * data from the child process (it send on std out)
+       */
       if (use_output_fd)
         {
           /* Close unused write end of output pipe */
@@ -169,6 +193,10 @@ popen_dup_listechainee(int* fd_in, int* fd_out, int* fd_err, int nargs, ...)
           *fd_out = fdout[READ_PIPE_END];
         }
 
+      /*
+       * We want to use the error pipe for the parent process to receive
+       * data from the child process (it send on std err)
+       */
       if (use_error_fd)
         {
           /* Close unused write end of error pipe */
@@ -177,50 +205,54 @@ popen_dup_listechainee(int* fd_in, int* fd_out, int* fd_err, int nargs, ...)
           *fd_err = fderr[READ_PIPE_END];          
         }
     }
-  /* And in parent */
-  else
+  /* And in parent process (the childpid is provided hence positive integer) */
+  else if (childpid > 0)
     {
-      /* Close file descr we do not need */
-      if (use_input_fd)
-        close(fdin[WRITE_PIPE_END]);  /* close write end of input pipe */
-      if (use_output_fd)
-        close(fdout[READ_PIPE_END]);  /* close read end of output pipe */
-      if (use_error_fd)
-        close(fderr[READ_PIPE_END]);  /* close read end of error pipe */
+      /*
+       * Setup our pipes ends as input/output for the child process
+       */
 
-      /* Setup our pipes ends as input/output for the child process */
+      /* If we use input pipe */
       if (use_input_fd)
         {
-          close(STDIN_FILENO);          		  /* Close the standard input fd */
-          if (dup(fdin[READ_PIPE_END]) == -1)     /* And set as std input the read end fd from the input pipe */
+          close(fdin[WRITE_PIPE_END]);  			/* close write end of input pipe */
+          close(STDIN_FILENO);          		  	/* Close the standard input fd */
+          if (dup(fdin[READ_PIPE_END]) == -1)     	/* And set as std input the read end fd from the input pipe */
             {
               perror("dup read end fd of input pipe");
               return -1;
             }
         }
+      /* If we use output pipe */
       if (use_output_fd)
         {
-          close(STDOUT_FILENO);                   /* Close the standard output fd */
-          if (dup(fdout[WRITE_PIPE_END]) == -1)   /* And set as std out the write end fd from the output pipe */          
+          close(fdout[READ_PIPE_END]);  			/* close read end of output pipe */
+          close(STDOUT_FILENO);                   	/* Close the standard output fd */
+          if (dup(fdout[WRITE_PIPE_END]) == -1)   	/* And set as std out the write end fd from the output pipe */          
             {
               perror("dup write end fd of output pipe");
               return -1;
             }
         }
+      /* If we use error pipe */
       if (use_error_fd)
         {
-          close(STDERR_FILENO);                   /* Finally close the standard error fd */
-          if (dup(fderr[WRITE_PIPE_END]) == -1)   /* And set as standard error the write end fd from the error pipe */          
+          close(fderr[READ_PIPE_END]);  			/* close read end of error pipe */
+          close(STDERR_FILENO);               	    /* Finally close the standard error fd */
+          if (dup(fderr[WRITE_PIPE_END]) == -1)   	/* And set as standard error the write end fd from the error pipe */          
             {
               perror("dup write end fd of error pipe");
               return -1;
             }
         }
-
+      
       /* Exec the child command */
       if (execv(args[0], args) == -1)
-        return -1;
-
+        {
+          perror("execv child command");
+          return -1;
+        }
+      
       /* Never reached */
       while(1);
     }
@@ -259,7 +291,7 @@ popen_dup_listechainee(int* fd_in, int* fd_out, int* fd_err, int nargs, ...)
   childpid = popen_dup_listechainee(&fds[STDIN_FILENO],                                             \
                                     &fds[STDOUT_FILENO],                                            \
                                     (int*)NULL,                                                     \
-                                    3, command_pathname, "-N", (char*)NULL);                        \
+                                    nbargs, __VA_ARGS__);                                           \
                                                                                                     \
   /* Wait for child to terminate */                                                                 \
   (void)waitpid(childpid, &wstatus, WNOHANG);                                                       \
@@ -270,9 +302,9 @@ popen_dup_listechainee(int* fd_in, int* fd_out, int* fd_err, int nargs, ...)
   FILE* fperr = (FILE*)(fds[STDERR_FILENO] == -1 ? NULL : fdopen(fds[STDERR_FILENO], "r"));         \
                                                                                                     \
   /* Check if we need to inject some input to the child process */                                  \
-  if (fpin && instrs[2] != (char*)NULL)                                                             \
+  if (fpin && instrs[nbin] != (char*)NULL)                                                          \
     {                                                                                               \
-      fwrite(instrs[2], strlen(instrs[2]), 1, fpin);                                                \
+      fwrite(instrs[nbin], strlen(instrs[nbin]), 1, fpin);                                          \
       /* flush the standard input of the child */                                                   \
       fflush(fpin);                                                                                 \
     }                                                                                               \
