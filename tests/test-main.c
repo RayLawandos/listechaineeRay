@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <time.h>
 
 #include <CUnit/Basic.h>
 
@@ -253,6 +254,31 @@ main(int argc, char** argv)
   /* Run all tests using the CUnit Basic interface */
   CU_basic_set_mode(CU_BRM_VERBOSE);
   CU_basic_run_tests();
+
+  struct timespec ts_req, ts_rem;
+  ts_req.tv_sec = 1;
+  ts_req.tv_nsec = 500000000L;
+  if (nanosleep((const struct timespec*)&ts_req, &ts_rem) == -1)
+    {
+      if (errno == EFAULT)
+        {
+          perror("nanosleep");
+          exit(1);
+        }
+      else if (errno == EINTR)
+        do
+          {
+            if (errno == EFAULT)
+              {
+                perror("nanosleep loop");
+                exit(1);
+              }
+            ts_req.tv_sec = ts_rem.tv_sec;
+            ts_req.tv_nsec = ts_rem.tv_nsec;
+          }
+        while(nanosleep((const struct timespec*)&ts_req, &ts_rem) == -1);
+    }
+  
   CU_cleanup_registry();
   testres = CU_get_error();
 
