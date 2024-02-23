@@ -44,7 +44,7 @@
  * The menu of the interactive command
  */
 #define MENU_MESSAGE                                                \
-    "\nMenu:\n"                                                     \
+    "Menu:\n"                                                       \
     "----:\n"                                                       \
     "     a) Display current list\n"                                \
     "     b) Reset/Init current list\n"                             \
@@ -353,10 +353,12 @@ char* results[NB_STDOUT_RESULTS] =
     /*  == $ listechainee -N << 'f 1 f 2 a q'                                                                                  = */
     "\n"
     MENU_MESSAGE
-    "Element to append ? List: [1]\n"
+    "Element to append ? "
+    "List: [1]\n"
     "\n"
     MENU_MESSAGE
-    "Element to append ? List: [1,2]\n"
+    "Element to append ? "
+    "List: [1,2]\n"
     "\n"
     MENU_MESSAGE
     "List: [1,2]\n"
@@ -376,18 +378,21 @@ char* results[NB_STDOUT_RESULTS] =
     /*  == $ listechainee -N << 'c testmenu.l a h 4 1 a h 5 3 a q '                                                            = */
     "\n"
     MENU_MESSAGE
-    "Filename to load ? List: [1,2,3]\n"
+    "Filename to load ? "
+    "List: [1,2,3]\n"
     "\n"
     MENU_MESSAGE
     "List: [1,2,3]\n"
     "\n"
     MENU_MESSAGE
-    "Element to insert ? Insert after element ? \n"
+    "Element to insert ? "
+    "Insert after element ? \n"
     MENU_MESSAGE
     "List: [1,4,2,3]\n"
     "\n"
     MENU_MESSAGE
-    "Element to insert ? Insert after element ? \n"
+    "Element to insert ? "
+    "Insert after element ? \n"
     MENU_MESSAGE
     "List: [1,4,2,3,5]\n"
     "\n"
