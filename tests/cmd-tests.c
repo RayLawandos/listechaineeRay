@@ -177,7 +177,7 @@ popen_dup_listechainee(int* fd_in, int* fd_out, int* fd_err, int nargs, ...)
           *fd_err = fderr[READ_PIPE_END];          
         }
     }
-  /* And in child */
+  /* And in parent */
   else
     {
       /* Close file descr we do not need */
@@ -350,23 +350,40 @@ popen_dup_listechainee(int* fd_in, int* fd_out, int* fd_err, int nargs, ...)
   /* Test assertions */                                                                             \
   if (fpout)                                                                                        \
     {                                                                                               \
-      if (strncmp(total_out, results[nbout], strlen(results[nbout])) != 0)                                \
-        fprintf(stdout, "\n%s\n", total_out);                                                       \
-      CU_ASSERT(strncmp(total_out, results[nbout], strlen(results[nbout])) == 0);                         \
+      if (strncmp(total_out, results[nbout], strlen(results[nbout])) != 0)                          \
+        {                                                                                           \
+          FILE* dbgtestfp = fopen(expect_testname, "w");                                            \
+          fprintf(dbgtestfp, "%s", results[nbout]);                                                 \
+          fclose(dbgtestfp);                                                                        \
+          dbgtestfp = fopen(effect_testname, "w");                                                  \
+          fprintf(dbgtestfp, "%s", total_out);                                                      \
+          fclose(dbgtestfp);                                                                        \
+        }                                                                                           \
+      CU_ASSERT(strncmp(total_out, results[nbout], strlen(results[nbout])) == 0);                   \
       free((void*)total_out);                                                                       \
     }                                                                                               \
   if (fperr)                                                                                        \
     {                                                                                               \
-      if (strncmp(total_err, errres[nberr], strlen(errres[nberr])) != 0)                                  \
-        fprintf(stdout, "\n%s\n", total_err);                                                       \
-      CU_ASSERT(strncmp(total_err, errres[nberr],  strlen(errres[nberr]))  == 0);                         \
+      if (strncmp(total_err, errres[nberr], strlen(errres[nberr])) != 0)                            \
+        {                                                                                           \
+          FILE* dbgtestfp = fopen(expect_testname, "w");                                            \
+          fprintf(dbgtestfp, "%s", errres[nberr]);                                                  \
+          fclose(dbgtestfp);                                                                        \
+          dbgtestfp = fopen(effect_testname, "w");                                                  \
+          fprintf(dbgtestfp, "%s", total_err);                                                      \
+          fclose(dbgtestfp);                                                                        \
+        }                                                                                           \
+      CU_ASSERT(strncmp(total_err, errres[nberr],  strlen(errres[nberr]))  == 0);                   \
       free((void*)total_err);                                                                       \
     }                                                                                               \
                                                                                                     \
   /* Close the pipes */                                                                             \
   if (fpin)  fclose(fpin);                                                                          \
   if (fpout) fclose(fpout);                                                                         \
-  if (fperr) fclose(fperr);
+  if (fperr) fclose(fperr);                                                                         \
+                                                                                                    \
+  /* Wait for child to terminate */                                                                 \
+  (void)waitpid(childpid, &wstatus, 0);
 
 /*
  * test_command_basic_invocation_0
@@ -376,6 +393,8 @@ popen_dup_listechainee(int* fd_in, int* fd_out, int* fd_err, int nargs, ...)
 void
 test_command_basic_invocation_0(void)
 {
+  char *effect_testname = "effect_test_command_basic_invocation_0.log";
+  char *expect_testname = "expect_test_command_basic_invocation_0.log";
   TEST_COMMAND_ARGS_VS_IO_RES_NB_FULL(-1, 0, 0,
                                       (int*)NULL, &fds[STDOUT_FILENO], &fds[STDERR_FILENO],
                                       2, command_pathname, (char*)NULL);
@@ -389,6 +408,8 @@ test_command_basic_invocation_0(void)
 void
 test_command_basic_invocation_v(void)
 {
+  char *effect_testname = "effect_test_command_basic_invocation_v.log";
+  char *expect_testname = "expect_test_command_basic_invocation_v.log";
   TEST_COMMAND_ARGS_VS_IO_RES_NB_FULL(-1, 1, 0,
                                       (int*)NULL, &fds[STDOUT_FILENO], &fds[STDERR_FILENO],
                                       3, command_pathname, "-v", (char*)NULL);
@@ -402,6 +423,8 @@ test_command_basic_invocation_v(void)
 void
 test_command_basic_invocation_vh(void)
 {
+  char *effect_testname = "effect_test_command_basic_invocation_vh.log";
+  char *expect_testname = "expect_test_command_basic_invocation_vh.log";
   TEST_COMMAND_ARGS_VS_IO_RES_NB_FULL(-1, 2, 0,
                                       (int*)NULL, &fds[STDOUT_FILENO], &fds[STDERR_FILENO],
                                       4, command_pathname, "-v", "-h", (char*)NULL);
@@ -415,6 +438,8 @@ test_command_basic_invocation_vh(void)
 void
 test_command_basic_invocation_verbose(void)
 {
+  char *effect_testname = "effect_test_command_basic_invocation_verbose.log";
+  char *expect_testname = "expect_test_command_basic_invocation_verbose.log";
   TEST_COMMAND_ARGS_VS_IO_RES_NB_FULL(-1, 3, 0,
                                       (int*)NULL, &fds[STDOUT_FILENO], &fds[STDERR_FILENO],
                                       3, command_pathname, "--verbose", (char*)NULL);
@@ -428,6 +453,8 @@ test_command_basic_invocation_verbose(void)
 void
 test_command_basic_invocation_verbose_help(void)
 {
+  char *effect_testname = "effect_test_command_basic_invocation_verbose_help.log";
+  char *expect_testname = "expect_test_command_basic_invocation_verbose_help.log";
   TEST_COMMAND_ARGS_VS_IO_RES_NB_FULL(-1, 4, 0,
                                       (int*)NULL, &fds[STDOUT_FILENO], &fds[STDERR_FILENO],
                                       4, command_pathname, "--verbose", "--help", (char*)NULL);
@@ -661,6 +688,8 @@ test_command_basic_invocation_verbose_load_testlist1_l_display(void)
 void
 test_command_basic_invocation_vl_testlist1_notfound_l_d(void)
 {
+  char *effect_testname = "effect_test_command_basic_invocation_vl_testlist1_notfound_l_d.log";
+  char *expect_testname = "expect_test_command_basic_invocation_vl_testlist1_notfound_l_d.log";
   TEST_COMMAND_ARGS_VS_IO_RES_NB_FULL(-1, 21, 1,
                                       (int*)NULL, &fds[STDOUT_FILENO], &fds[STDERR_FILENO],
                                       6, command_pathname, "-v", "-l", "testlist1-notfound.l", "-d", (char*)NULL);
@@ -674,6 +703,8 @@ test_command_basic_invocation_vl_testlist1_notfound_l_d(void)
 void
 test_command_basic_invocation_verbose_load_testlist1_notfound_l_display(void)
 {
+  char *effect_testname = "effect_test_command_basic_invocation_verbose_load_testlist1_notfound_l_display.log";
+  char *expect_testname = "expect_test_command_basic_invocation_verbose_load_testlist1_notfound_l_display.log";
   TEST_COMMAND_ARGS_VS_IO_RES_NB_FULL(-1, 22, 2,
                                       (int*)NULL, &fds[STDOUT_FILENO], &fds[STDERR_FILENO],
                                       6, command_pathname, "--verbose", "--load", "testlist1-notfound.l", "--display", (char*)NULL);
@@ -874,6 +905,8 @@ test_command_basic_invocation_l_testlist1_l_A1dr4d(void)
 void
 test_command_menu_invocation_append_display(void)
 {
+  char *effect_testname = "effect_test_command_menu_invocation_append_display.log";
+  char *expect_testname = "expect_test_command_menu_invocation_append_display.log";
   TEST_COMMAND_ARGS_VS_IO_RES_NB_FULL(0, 40, -1,
                                       &fds[STDIN_FILENO], &fds[STDOUT_FILENO], (int*)NULL,
                                       3, command_pathname, "-N", (char*)NULL);
@@ -888,6 +921,8 @@ test_command_menu_invocation_append_display(void)
 void
 test_command_menu_invocation_help_quit(void)
 {
+  char *effect_testname = "effect_test_command_menu_invocation_help_quit.log";
+  char *expect_testname = "expect_test_command_menu_invocation_help_quit.log";
   TEST_COMMAND_ARGS_VS_IO_RES_NB_FULL(1, 41, -1,
                                       &fds[STDIN_FILENO], &fds[STDOUT_FILENO], (int*)NULL,
                                       3, command_pathname, "-N", (char*)NULL);
@@ -902,6 +937,8 @@ test_command_menu_invocation_help_quit(void)
 void
 test_command_menu_invocation_load_insert_x_2_display_quit(void)
 {
+  char *effect_testname = "effect_test_command_menu_invocation_load_insert_x_2_display_quit.log";
+  char *expect_testname = "expect_test_command_menu_invocation_load_insert_x_2_display_quit.log";
   TEST_COMMAND_ARGS_VS_IO_RES_NB_FULL(1, 41, -1,
                                       &fds[STDIN_FILENO], &fds[STDOUT_FILENO], (int*)NULL,
                                       3, command_pathname, "-N", (char*)NULL);
