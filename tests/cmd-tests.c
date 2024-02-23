@@ -29,15 +29,6 @@ extern const char * const sys_errlist[];
 #include "tests/cmd-tests.h"
 #include "tests/tests-results.h"
 
-/* Constants */
-#define BUFFER_MAX_SIZE             4096
-#define ERROR_BUFFER_SIZE           1024
-#define LIST_BUFFER_SIZE            1024
-
-/* Numbering for pipe ends (reading, writing) */
-#define READ_PIPE_END               0
-#define WRITE_PIPE_END              1
-
 /* Buffers used for reading the command output */
 char outbuf[BUFFER_MAX_SIZE];
 char errbuf[BUFFER_MAX_SIZE];
@@ -139,15 +130,17 @@ popen_dup_listechainee(int* fd_in, int* fd_out, int* fd_err, int nargs, ...)
   while(--n);
   va_end(ap);
 
-  /* Create our three pipes: input, output and error */
+  /*
+   * Create our three pipes: input, output and error
+   */
   if (use_input_fd)
-    if (pipe2(fdin,  O_NONBLOCK) == -1) /* One for standard input */
+    if (pipe2(fdin, O_NONBLOCK) == -1) 	/* One for standard input */
       {
         perror("create input pipe");
         return -1;          
       }
   if (use_output_fd)
-    if (pipe2(fdout, 0) == -1)  /* One for standard output */ 
+    if (pipe2(fdout, 0) == -1)  		/* One for standard output */ 
       {
         perror("create output pipe");
         return -1;          
@@ -176,9 +169,9 @@ popen_dup_listechainee(int* fd_in, int* fd_out, int* fd_err, int nargs, ...)
       if (use_input_fd)
         {
           /* Close unused read end of input pipe */
-          close(fdin[READ_PIPE_END]);
+          close(fdin[PIPE_READ_END]);
           /* Copy as std input the in fd of the input pipe  */
-          *fd_in = fdin[WRITE_PIPE_END];          
+          *fd_in = fdin[PIPE_WRITE_END];          
         }
 
       /*
@@ -188,9 +181,9 @@ popen_dup_listechainee(int* fd_in, int* fd_out, int* fd_err, int nargs, ...)
       if (use_output_fd)
         {
           /* Close unused write end of output pipe */
-          close(fdout[WRITE_PIPE_END]);
+          close(fdout[PIPE_WRITE_END]);
           /* Copy as std output the out fd of the out pipe */
-          *fd_out = fdout[READ_PIPE_END];
+          *fd_out = fdout[PIPE_READ_END];
         }
 
       /*
@@ -200,12 +193,14 @@ popen_dup_listechainee(int* fd_in, int* fd_out, int* fd_err, int nargs, ...)
       if (use_error_fd)
         {
           /* Close unused write end of error pipe */
-          close(fderr[WRITE_PIPE_END]);
+          close(fderr[PIPE_WRITE_END]);
           /* Copy as std error the out fd of the err pipe */
-          *fd_err = fderr[READ_PIPE_END];          
+          *fd_err = fderr[PIPE_READ_END];          
         }
     }
-  /* And in parent process (the childpid is provided hence positive integer) */
+  /*
+   * And in parent process (the childpid is provided hence positive integer)
+   */
   else if (childpid > 0)
     {
       /*
@@ -215,9 +210,9 @@ popen_dup_listechainee(int* fd_in, int* fd_out, int* fd_err, int nargs, ...)
       /* If we use input pipe */
       if (use_input_fd)
         {
-          close(fdin[WRITE_PIPE_END]);  			/* close write end of input pipe */
+          close(fdin[PIPE_WRITE_END]);  			/* close write end of input pipe */
           close(STDIN_FILENO);          		  	/* Close the standard input fd */
-          if (dup(fdin[READ_PIPE_END]) == -1)     	/* And set as std input the read end fd from the input pipe */
+          if (dup(fdin[PIPE_READ_END]) == -1)     	/* And set as std input the read end fd from the input pipe */
             {
               perror("dup read end fd of input pipe");
               return -1;
@@ -226,9 +221,9 @@ popen_dup_listechainee(int* fd_in, int* fd_out, int* fd_err, int nargs, ...)
       /* If we use output pipe */
       if (use_output_fd)
         {
-          close(fdout[READ_PIPE_END]);  			/* close read end of output pipe */
+          close(fdout[PIPE_READ_END]);  			/* close read end of output pipe */
           close(STDOUT_FILENO);                   	/* Close the standard output fd */
-          if (dup(fdout[WRITE_PIPE_END]) == -1)   	/* And set as std out the write end fd from the output pipe */          
+          if (dup(fdout[PIPE_WRITE_END]) == -1)   	/* And set as std out the write end fd from the output pipe */          
             {
               perror("dup write end fd of output pipe");
               return -1;
@@ -237,9 +232,9 @@ popen_dup_listechainee(int* fd_in, int* fd_out, int* fd_err, int nargs, ...)
       /* If we use error pipe */
       if (use_error_fd)
         {
-          close(fderr[READ_PIPE_END]);  			/* close read end of error pipe */
+          close(fderr[PIPE_READ_END]);  			/* close read end of error pipe */
           close(STDERR_FILENO);               	    /* Finally close the standard error fd */
-          if (dup(fderr[WRITE_PIPE_END]) == -1)   	/* And set as standard error the write end fd from the error pipe */          
+          if (dup(fderr[PIPE_WRITE_END]) == -1)   	/* And set as standard error the write end fd from the error pipe */          
             {
               perror("dup write end fd of error pipe");
               return -1;

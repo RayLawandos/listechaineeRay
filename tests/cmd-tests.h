@@ -19,6 +19,15 @@
 
 extern const char const* command_pathname;
 
+/* Constants */
+#define BUFFER_MAX_SIZE             4096
+#define ERROR_BUFFER_SIZE           1024
+#define LIST_BUFFER_SIZE            1024
+
+/* Numbering for pipe ends (reading, writing) */
+#define PIPE_READ_END               0
+#define PIPE_WRITE_END              1
+
 /*
  * Declarations for command test functions
  */
