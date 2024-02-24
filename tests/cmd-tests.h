@@ -17,12 +17,14 @@
 
 #define USED_COMMAND_STRING         DEBUG_COMMAND_STRING
 
+// Extern command path name (from main)
 extern const char const* command_pathname;
 
 /* Constants */
 #define BUFFER_MAX_SIZE             4096
 #define ERROR_BUFFER_SIZE           1024
 #define LIST_BUFFER_SIZE            1024
+#define MESSAGE_MAX_SIZE            1024
 
 /* Numbering for pipe ends (reading, writing) */
 #define PIPE_READ_END               0
