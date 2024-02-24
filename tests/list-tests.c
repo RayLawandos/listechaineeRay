@@ -18,7 +18,7 @@ extern listechainee_ptr curlist;
  * Test for init_list
  */
 void
-test_init_list(void)
+test_1_1_init_list(void)
 {
   /* Assert test conditions */
   init_list();
@@ -29,7 +29,7 @@ test_init_list(void)
  * Test for reinit_list
  */
 void
-test_reinit_list(void)
+test_1_2_reinit_list(void)
 {
   /* Assert test conditions */
   listechainee_ptr list = (listechainee_ptr)malloc(sizeof(struct listechainee_st));
@@ -45,7 +45,7 @@ test_reinit_list(void)
  * A test with list being NULL
  */
 void
-test_ix_in_list_with_list_null(void)
+test_1_3_ix_in_list_with_list_null(void)
 {
   /* Add ix 0 in null list is ok */
   CU_ASSERT(test_ix_in_list((listechainee_ptr)NULL, -1) == 0);
@@ -60,7 +60,7 @@ test_ix_in_list_with_list_null(void)
  * A test with list having one element only
  */
 void
-test_ix_in_list_with_list_with_ix(void)
+test_1_4_ix_in_list_with_list_with_ix(void)
 {
   /* Allocate list for the test */
   listechainee_ptr list = (listechainee_ptr)malloc(sizeof(struct listechainee_st));
@@ -82,7 +82,7 @@ test_ix_in_list_with_list_with_ix(void)
  * A test with list having two elements
  */
 void
-test_ix_in_list_with_list_without_ix(void)
+test_1_5_ix_in_list_with_list_without_ix(void)
 {
   /* Allocate list for the test */
   listechainee_ptr list = (listechainee_ptr)malloc(sizeof(struct listechainee_st));
@@ -109,7 +109,7 @@ test_ix_in_list_with_list_without_ix(void)
  * A test with list NULL
  */
 void
-test_elem_in_list_with_null_list(void)
+test_1_6_elem_in_list_with_null_list(void)
 {
   /* Asserting test conditions */
   CU_ASSERT(test_elem_in_list((listechainee_ptr)NULL,-1) == 0);
@@ -123,7 +123,7 @@ test_elem_in_list_with_null_list(void)
  * A test with list non NULL
  */
 void
-test_elem_in_list_with_non_null_list1(void)
+test_1_7_elem_in_list_with_non_null_list1(void)
 {
   /* Allocate list for the test */
   listechainee_ptr list = (listechainee_ptr)malloc(sizeof(struct listechainee_st));
@@ -150,7 +150,7 @@ test_elem_in_list_with_non_null_list1(void)
  * A test with list non NULL and at int limit
  */
 void
-test_elem_in_list_with_non_null_list2(void)
+test_1_8_elem_in_list_with_non_null_list2(void)
 {
   /* Allocate list for the test */
   listechainee_ptr list = (listechainee_ptr)malloc(sizeof(struct listechainee_st));
@@ -178,7 +178,7 @@ test_elem_in_list_with_non_null_list2(void)
  * A test with list non NULL and at int limit
  */
 void
-test_elem_in_list_with_non_null_list3(void)
+test_1_9_elem_in_list_with_non_null_list3(void)
 {
   /* Allocate list for the test */
   listechainee_ptr list = (listechainee_ptr)malloc(sizeof(struct listechainee_st));
@@ -206,7 +206,7 @@ test_elem_in_list_with_non_null_list3(void)
  * A test for appending element in list
  */
 void
-test_append_list_with_list_null(void)
+test_1_10_append_list_with_list_null(void)
 {
   listechainee_ptr list = (listechainee_ptr)NULL;
   CU_ASSERT((list = append_list((listechainee_ptr)NULL, 0)) != NULL);
@@ -227,7 +227,7 @@ test_append_list_with_list_null(void)
  * A test for appending element in non null list
  */
 void
-test_append_list_with_list_non_null(void)
+test_1_11_append_list_with_list_non_null(void)
 {
   listechainee_ptr list = (listechainee_ptr)malloc(sizeof(struct listechainee_st));
   list->N = 0;
@@ -254,7 +254,7 @@ test_append_list_with_list_non_null(void)
  * A test for prepending element in list
  */
 void
-test_prepend_list_with_list_null(void)
+test_1_12_prepend_list_with_list_null(void)
 {
   listechainee_ptr list = (listechainee_ptr)NULL;
   CU_ASSERT((list = prepend_list(list, 0)) != NULL);
@@ -277,7 +277,7 @@ test_prepend_list_with_list_null(void)
  * A test for prepending element in non null list
  */
 void
-test_prepend_list_with_list_non_null(void)
+test_1_13_prepend_list_with_list_non_null(void)
 {
   listechainee_ptr list = (listechainee_ptr)malloc(sizeof(struct listechainee_st));
   list->N = 0;
