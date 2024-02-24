@@ -111,6 +111,24 @@ main(int argc, char** argv, char** envp)
   /* Extract the program name from the first argument */
   char* progname = (progname = rindex(argv[0], '/')) ? progname+1 : argv[0];
 
+  /* Get current date */
+  time_t current_time = time((time_t*)NULL);
+  char* datestr = ctime(&current_time);  
+  datestr[strlen(datestr)-1] = '\0';
+  char* date_tmp = datestr;
+  while(*date_tmp)
+    {
+      if (*date_tmp == ' ')
+        *date_tmp = '_';
+      date_tmp++;
+    }
+  
+  /* Init logging */
+  char logfilepath[1024];
+  snprintf(logfilepath, 1024, "%s_%s.log", progname, datestr);
+  loglvl = LOG_LVL_INFO;
+  logfp = init_log(logfilepath, loglvl);
+
   /* If a pathname was provided for a command */
   if (argc == 1)
     command_pathname = stat_listechainee(NULL);
@@ -311,6 +329,9 @@ main(int argc, char** argv, char** envp)
         while(nanosleep((const struct timespec*)&ts_req, &ts_rem));
     }
 
+  // Terminate logging
+  end_log(logfp);
+  
   // Return the test main function
   return testres;
 }
