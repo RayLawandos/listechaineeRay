@@ -4,9 +4,17 @@
  * Implementation des fonctions de logging
  */
 
+#include <stdlib.h>
+
 #include "src/log.h"
 
+/* File pointer for log file */
+FILE* logfp = (FILE*)NULL;
 static FILE* local_log_fp = (FILE*)NULL;
+
+/* Level of logging */
+loglvl_t loglvl = LOG_LVL_INFO;
+
 /*
  * init_log
  *
@@ -19,7 +27,7 @@ init_log(char* log_filepath, loglvl_t log_level)
 {
   if (log_filepath == (char*)NULL)
     {
-      sprintf(stderr, "Error: cannot initialize logging without a file pathname\n");
+      fprintf(stderr, "Error: cannot initialize logging without a file pathname\n");
       return (FILE*)NULL;
     }
 
@@ -44,7 +52,7 @@ init_log(char* log_filepath, loglvl_t log_level)
  * It returns the number of arguments printed in the provided format.
  */
 int
-do_log(FILE* logfp, int loglvl, char* logfmt, ...)
+do_log(FILE* logfp, loglvl_t loglvl, char* logfmt, ...)
 {
   unsigned int n_printed_args = 0;
   va_list ap;
