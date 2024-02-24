@@ -10,6 +10,7 @@
 
 #include "list/list.h"
 
+// Buffer size for loading/saving list files
 #define BUFFER_MAX_SIZE 		  20
 
 /* Extern decl of current listechainee */
