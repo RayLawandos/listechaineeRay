@@ -14,11 +14,19 @@ extern int errno;
 extern int sys_nerr;
 extern const char * const sys_errlist[];
 
+// Global env vars pointer
+char** global_envp = (char**)NULL;
+
 #include <CUnit/Basic.h>
 
-#include "list/list.h"
-#include "list-tests.h"			// Include tests decl for list library
-#include "cmd-tests.h"			// Include tests decl for command line behaviour
+#include "src/log.h"					// Include the logging header
+#include "list/list.h"					// Include the list header
+#include "tests/list-tests.h"			// Include tests decl for list library
+#include "tests/cmd-tests.h"			// Include tests decl for command line behaviour
+
+/* Wait for the childprocess to terminate before the parent process ends */
+#define NUMBER_SECONDS_TO_WAIT 		0
+#define NUMBER_NANOSECONDS_TO_WAIT 	200000000L
 
 /* List chainee courante */
 listechainee_ptr curlist = (listechainee_ptr)NULL;
@@ -26,7 +34,7 @@ listechainee_ptr curlist = (listechainee_ptr)NULL;
 /*
  * Forward decl for our functions
  */
-int main(int, char**);
+int main(int, char**, char**);
 int init_suite_tests4list(void);
 int clean_suite_tests4list(void);
 int init_suite_tests4cmd(void);
@@ -66,6 +74,8 @@ int clean_suite_tests4list(void)
  */
 int init_suite_tests4cmd(void)
 {
+  // Erase all expected_|effective log files
+  system("/bin/rm -f expected_*.log effective_*.log");
   return 0;
 }
 
@@ -90,10 +100,13 @@ int clean_suite_tests4cmd(void)
  * provision the tests for each test suite and finally executes all tests.
  */
 int
-main(int argc, char** argv)
+main(int argc, char** argv, char** envp)
 {
   int testres = 0;  
   CU_pSuite pSuite = NULL;
+
+  /* Save env ptr in global var */
+  global_envp = envp;
 
   /* Extract the program name from the first argument */
   char* progname = (progname = rindex(argv[0], '/')) ? progname+1 : argv[0];
@@ -125,31 +138,31 @@ main(int argc, char** argv)
 
   /* add the tests to the suite */
   /* 6 tests */
-  if ((NULL == CU_add_test(pSuite, "test of test_init_list", 
+  if ((NULL == CU_add_test(pSuite, "test #1.01: test_init_list", 
                            test_init_list)) ||
-      (NULL == CU_add_test(pSuite, "test of test_reinit_list", 
+      (NULL == CU_add_test(pSuite, "test #1.02: test_reinit_list", 
                            test_reinit_list)) ||
-      (NULL == CU_add_test(pSuite, "test of test_ix_in_list with null list", 
+      (NULL == CU_add_test(pSuite, "test #1.03: test_ix_in_list with null list", 
                            test_ix_in_list_with_list_null)) ||
-      (NULL == CU_add_test(pSuite, "test of test_ix_in_list with list with ix", 
+      (NULL == CU_add_test(pSuite, "test #1.04: test_ix_in_list with list with ix", 
                            test_ix_in_list_with_list_with_ix)) ||
-      (NULL == CU_add_test(pSuite, "test of test_ix_in_list with list without ix", 
+      (NULL == CU_add_test(pSuite, "test #1.05: test_ix_in_list with list without ix", 
                            test_ix_in_list_with_list_without_ix)) ||
-      (NULL == CU_add_test(pSuite, "test of test_elem_in_list with null list", 
+      (NULL == CU_add_test(pSuite, "test #1.06: test_elem_in_list with null list", 
                            test_elem_in_list_with_null_list)) ||
-      (NULL == CU_add_test(pSuite, "test of test_elem_in_list with non null list", 
+      (NULL == CU_add_test(pSuite, "test #1.07: test_elem_in_list with non null list", 
                            test_elem_in_list_with_non_null_list1)) ||
-      (NULL == CU_add_test(pSuite, "test of test_elem_in_list with non null list (int limit)", 
+      (NULL == CU_add_test(pSuite, "test #1.08: test_elem_in_list with non null list (int limit)", 
                            test_elem_in_list_with_non_null_list2)) ||
-      (NULL == CU_add_test(pSuite, "test of test_elem_in_list with non null list (int limit) #2", 
+      (NULL == CU_add_test(pSuite, "test #1.09: test_elem_in_list with non null list (int limit) #2", 
                            test_elem_in_list_with_non_null_list3)) ||
-      (NULL == CU_add_test(pSuite, "test of test_append_list_with_list_null", 
+      (NULL == CU_add_test(pSuite, "test #1.10: test_append_list_with_list_null", 
                            test_append_list_with_list_null)) ||
-      (NULL == CU_add_test(pSuite, "test of test_append_list_with_list_non_null", 
+      (NULL == CU_add_test(pSuite, "test #1.11: test_append_list_with_list_non_null", 
                            test_append_list_with_list_non_null)) ||
-      (NULL == CU_add_test(pSuite, "test of test_prepend_list_with_list_null", 
+      (NULL == CU_add_test(pSuite, "test #1.12: test_prepend_list_with_list_null", 
                            test_prepend_list_with_list_null)) ||
-      (NULL == CU_add_test(pSuite, "test of test_prepend_list_with_list_non_null", 
+      (NULL == CU_add_test(pSuite, "test #1.13: test_prepend_list_with_list_non_null", 
                            test_prepend_list_with_list_non_null))
       )
     {
@@ -166,89 +179,89 @@ main(int argc, char** argv)
   }
 
   /* add the tests for the command to the suite */
-  if ((NULL == CU_add_test(pSuite, "test basic command launch ",
+  if ((NULL == CU_add_test(pSuite, "test #2.01: basic command launch ",
                            test_command_basic_invocation_0)) ||
-      (NULL == CU_add_test(pSuite, "test basic command launch verbose (-v)",
+      (NULL == CU_add_test(pSuite, "test #2.02: basic command launch verbose (-v)",
                            test_command_basic_invocation_v)) ||
-      (NULL == CU_add_test(pSuite, "test command launch verbose+help (-v -h)",
+      (NULL == CU_add_test(pSuite, "test #2.03: command launch verbose+help (-v -h)",
                            test_command_basic_invocation_vh)) ||
-      (NULL == CU_add_test(pSuite, "test command launch long verbose (--verbose)", 
+      (NULL == CU_add_test(pSuite, "test #2.04: command launch long verbose (--verbose)", 
                            test_command_basic_invocation_verbose)) ||
-      (NULL == CU_add_test(pSuite, "test command launch long verbose+help (--verbose --help)", 
+      (NULL == CU_add_test(pSuite, "test #2.05: command launch long verbose+help (--verbose --help)", 
                            test_command_basic_invocation_verbose_help)) ||
-      (NULL == CU_add_test(pSuite, "test command launch append+display (-A 1 -d)", 
+      (NULL == CU_add_test(pSuite, "test #2.06: command launch append+display (-A 1 -d)", 
                            test_command_basic_invocation_A1d)) ||
-      (NULL == CU_add_test(pSuite, "test command launch prepend+display (-P 2 -d)", 
+      (NULL == CU_add_test(pSuite, "test #2.07: command launch prepend+display (-P 2 -d)", 
                            test_command_basic_invocation_P2d)) ||
-      (NULL == CU_add_test(pSuite, "test command launch long append+display (--append 3 --display)", 
+      (NULL == CU_add_test(pSuite, "test #2.08: command launch long append+display (--append 3 --display)", 
                            test_command_basic_invocation_append_3_display)) ||
-      (NULL == CU_add_test(pSuite, "test command launch long prepend+display (--prepend 4 --display)", 
+      (NULL == CU_add_test(pSuite, "test #2.09: command launch long prepend+display (--prepend 4 --display)", 
                            test_command_basic_invocation_prepend_4_display)) ||
-      (NULL == CU_add_test(pSuite, "test command launch append+prepend+display (-A 1 -P 2 -d)", 
+      (NULL == CU_add_test(pSuite, "test #2.10: command launch append+prepend+display (-A 1 -P 2 -d)", 
                            test_command_basic_invocation_A1P2d)) ||
-      (NULL == CU_add_test(pSuite, "test command launch long append+prepend+display (--append 1 --prepend 2 --display)", 
+      (NULL == CU_add_test(pSuite, "test #2.11: command launch long append+prepend+display (--append 1 --prepend 2 --display)", 
                            test_command_basic_invocation_append_1_prepend_2_display)) ||
-      (NULL == CU_add_test(pSuite, "test command launch verbose+append+display (-v -A 1 -d)", 
+      (NULL == CU_add_test(pSuite, "test #2.12: command launch verbose+append+display (-v -A 1 -d)", 
                            test_command_basic_invocation_vA1d)) ||
-      (NULL == CU_add_test(pSuite, "test command launch verbose+prepend+display (-v -P 2 -d)", 
+      (NULL == CU_add_test(pSuite, "test #2.13: command launch verbose+prepend+display (-v -P 2 -d)", 
                            test_command_basic_invocation_vP2d)) ||
-      (NULL == CU_add_test(pSuite, "test command launch long verbose+append+display (--verbose --append 3 --display)", 
+      (NULL == CU_add_test(pSuite, "test #2.14: command launch long verbose+append+display (--verbose --append 3 --display)", 
                            test_command_basic_invocation_verbose_append_3_display)) ||
-      (NULL == CU_add_test(pSuite, "test command launch long verbose+prepend+display (--verbose --prepend 4 --display)", 
+      (NULL == CU_add_test(pSuite, "test #2.15: command launch long verbose+prepend+display (--verbose --prepend 4 --display)", 
                            test_command_basic_invocation_verbose_prepend_4_display)) ||
-      (NULL == CU_add_test(pSuite, "test command launch verbose+append+prepend+display (-v -A 1 -P 2 -d)", 
+      (NULL == CU_add_test(pSuite, "test #2.16: command launch verbose+append+prepend+display (-v -A 1 -P 2 -d)", 
                            test_command_basic_invocation_vA1P2d)) ||
-      (NULL == CU_add_test(pSuite, "test command launch long verbose+append+prepend+display (--verbose --append 1 --prepend 2 --display)", 
+      (NULL == CU_add_test(pSuite, "test #2.17: command launch long verbose+append+prepend+display (--verbose --append 1 --prepend 2 --display)", 
                            test_command_basic_invocation_verbose_append_1_prepend_2_display)) ||
-      (NULL == CU_add_test(pSuite, "test command launch verbose+append+prepend+display+save (-v -A 1 -P 2 -d -s testlist1.l)", 
+      (NULL == CU_add_test(pSuite, "test #2.18: command launch verbose+append+prepend+display+save (-v -A 1 -P 2 -d -s testlist1.l)", 
                            test_command_basic_invocation_vA1P2ds_testlist1_l)) ||
-      (NULL == CU_add_test(pSuite, "test command launch long verbose+append+prepend+display+save (--verbose --append 1 --prepend 2 --display --save testlist1.l)", 
+      (NULL == CU_add_test(pSuite, "test #2.19: command launch long verbose+append+prepend+display+save (--verbose --append 1 --prepend 2 --display --save testlist1.l)", 
                            test_command_basic_invocation_verbose_append_1_prepend_2_display_save_testlist1_l)) ||
-      (NULL == CU_add_test(pSuite, "test command launch verbose+load+display (-v -l testlist1.l -d)", 
+      (NULL == CU_add_test(pSuite, "test #2.20: command launch verbose+load+display (-v -l testlist1.l -d)", 
                            test_command_basic_invocation_vl_testlist1_l_d)) ||
-      (NULL == CU_add_test(pSuite, "test command launch long verbose+loaderr+display (--verbose --load testlist1-notfound.l --display)", 
+      (NULL == CU_add_test(pSuite, "test #2.21: command launch long verbose+loaderr+display (--verbose --load testlist1-notfound.l --display)", 
                            test_command_basic_invocation_verbose_load_testlist1_notfound_l_display)) ||
-      (NULL == CU_add_test(pSuite, "test command launch verbose+loaderr+display (-v -l testlist1-notfound.l -d)", 
+      (NULL == CU_add_test(pSuite, "test #2.22: command launch verbose+loaderr+display (-v -l testlist1-notfound.l -d)", 
                            test_command_basic_invocation_vl_testlist1_notfound_l_d)) ||
-      (NULL == CU_add_test(pSuite, "test command launch append+remove+prepend+remove (-A 1 -A 2 -A 3 -d -r 1 -d -P 4 -d -r 2 -d -r 4 -d -r 3 -d -r 3 -d)", 
+      (NULL == CU_add_test(pSuite, "test #2.23: command launch append+remove+prepend+remove (-A 1 -A 2 -A 3 -d -r 1 -d -P 4 -d -r 2 -d -r 4 -d -r 3 -d -r 3 -d)", 
                            test_command_basic_invocation_A1A2A3dr1dP4dr2dr4dr3dr3d)) ||
-      (NULL == CU_add_test(pSuite, "test command launch append+insert 4,1 (-A 1 -A 2 -A 3 -d -I4,1 -d)", 
+      (NULL == CU_add_test(pSuite, "test #2.24: command launch append+insert 4,1 (-A 1 -A 2 -A 3 -d -I4,1 -d)", 
                            test_command_basic_invocation_A1A2A3dI41d)) ||
-      (NULL == CU_add_test(pSuite, "test command launch append+insert 4,2 (-A 1 -A 2 -A 3 -d -I4,2 -d)", 
+      (NULL == CU_add_test(pSuite, "test #2.25: command launch append+insert 4,2 (-A 1 -A 2 -A 3 -d -I4,2 -d)", 
                            test_command_basic_invocation_A1A2A3dI42d)) ||
-      (NULL == CU_add_test(pSuite, "test command launch append+insert 4,3 (-A 1 -A 2 -A 3 -d -I4,3 -d)", 
+      (NULL == CU_add_test(pSuite, "test #2.26: command launch append+insert 4,3 (-A 1 -A 2 -A 3 -d -I4,3 -d)", 
                            test_command_basic_invocation_A1A2A3dI43d)) ||
-      (NULL == CU_add_test(pSuite, "test command launch append+insert 4,4 (-A 1 -A 2 -A 3 -d -I4,4 -d)", 
+      (NULL == CU_add_test(pSuite, "test #2.27: command launch append+insert 4,4 (-A 1 -A 2 -A 3 -d -I4,4 -d)", 
                            test_command_basic_invocation_A1A2A3dI44d)) ||
-      (NULL == CU_add_test(pSuite, "test command launch append+insert 1,2 (-A 1 -A 2 -A 3 -d -I1,2 -d)", 
+      (NULL == CU_add_test(pSuite, "test #2.28: command launch append+insert 1,2 (-A 1 -A 2 -A 3 -d -I1,2 -d)", 
                            test_command_basic_invocation_A1A2A3dI44d)) ||
-      (NULL == CU_add_test(pSuite, "test command launch append+insert 4,+0 (-A 1 -A 2 -A 3 -d -I4,+0 -d)", 
+      (NULL == CU_add_test(pSuite, "test #2.29: command launch append+insert 4,+0 (-A 1 -A 2 -A 3 -d -I4,+0 -d)", 
                            test_command_basic_invocation_A1A2A3dI4plus0d)) ||
-      (NULL == CU_add_test(pSuite, "test command launch append+insert 4,+1 (-A 1 -A 2 -A 3 -d -I4,+1 -d)", 
+      (NULL == CU_add_test(pSuite, "test #2.30: command launch append+insert 4,+1 (-A 1 -A 2 -A 3 -d -I4,+1 -d)", 
                            test_command_basic_invocation_A1A2A3dI4plus1d)) ||
-      (NULL == CU_add_test(pSuite, "test command launch append+insert 4,+2 (-A 1 -A 2 -A 3 -d -I4,+2 -d)", 
+      (NULL == CU_add_test(pSuite, "test #2.31: command launch append+insert 4,+2 (-A 1 -A 2 -A 3 -d -I4,+2 -d)", 
                            test_command_basic_invocation_A1A2A3dI4plus2d)) ||
-      (NULL == CU_add_test(pSuite, "test command launch append+insert 4,+3 (-A 1 -A 2 -A 3 -d -I4,+3 -d)", 
+      (NULL == CU_add_test(pSuite, "test #2.32: command launch append+insert 4,+3 (-A 1 -A 2 -A 3 -d -I4,+3 -d)", 
                            test_command_basic_invocation_A1A2A3dI4plus3d)) ||
-      (NULL == CU_add_test(pSuite, "test command launch append+insert 1,+0 (-A 1 -A 2 -A 3 -d -I1,+0 -d)", 
+      (NULL == CU_add_test(pSuite, "test #2.33: command launch append+insert 1,+0 (-A 1 -A 2 -A 3 -d -I1,+0 -d)", 
                            test_command_basic_invocation_A1A2A3dI1plus0d)) ||
-      (NULL == CU_add_test(pSuite, "test command launch load+display+test1+test2+test3 (-l testlist1.l -d -t 1 -t 2 -t 3)", 
+      (NULL == CU_add_test(pSuite, "test #2.34: command launch load+display+test1+test2+test3 (-l testlist1.l -d -t 1 -t 2 -t 3)", 
                            test_command_basic_invocation_l_testlist1_l_dt1t2t3)) ||
-      (NULL == CU_add_test(pSuite, "test command launch verbose+load+display+test1+test2+test3 (-v -l testlist1.l -d -t 1 -t 2 -t 3)", 
+      (NULL == CU_add_test(pSuite, "test #2.35: command launch verbose+load+display+test1+test2+test3 (-v -l testlist1.l -d -t 1 -t 2 -t 3)", 
                            test_command_basic_invocation_vl_testlist1_l_dt1t2t3)) ||
-      (NULL == CU_add_test(pSuite, "test command launch load+append+display+remove2 (-l testlist1.l -A 3 -d -r 2)", 
+      (NULL == CU_add_test(pSuite, "test #2.36: command launch load+append+display+remove2 (-l testlist1.l -A 3 -d -r 2)", 
                            test_command_basic_invocation_l_testlist1_l_A1dr2d)) ||
-      (NULL == CU_add_test(pSuite, "test command launch load+append+display+remove1 (-l testlist1.l -A 3 -d -r 1)", 
+      (NULL == CU_add_test(pSuite, "test #2.37: command launch load+append+display+remove1 (-l testlist1.l -A 3 -d -r 1)", 
                            test_command_basic_invocation_l_testlist1_l_A1dr1d)) ||
-      (NULL == CU_add_test(pSuite, "test command launch load+append+display+remove3 (-l testlist1.l -A 3 -d -r 3)", 
+      (NULL == CU_add_test(pSuite, "test #2.38: command launch load+append+display+remove3 (-l testlist1.l -A 3 -d -r 3)", 
                            test_command_basic_invocation_l_testlist1_l_A1dr3d)) ||
-      (NULL == CU_add_test(pSuite, "test command launch load+append+display+remove4 (-l testlist1.l -A 3 -d -r 4)", 
+      (NULL == CU_add_test(pSuite, "test #2.39: command launch load+append+display+remove4 (-l testlist1.l -A 3 -d -r 4)", 
                            test_command_basic_invocation_l_testlist1_l_A1dr4d)) ||
-      (NULL == CU_add_test(pSuite, "test menu launch (-N) << 'f 1 f 2 a q'", 
+      (NULL == CU_add_test(pSuite, "test #2.40: menu launch (-N) and append+append+display+quit << 'f 1 f 2 a q'", 
                            test_command_menu_invocation_append_display)) ||
-      (NULL == CU_add_test(pSuite, "test menu launch (-N) << 'm q'", 
+      (NULL == CU_add_test(pSuite, "test #2.41: menu launch (-N) and help+quit << 'm q'", 
                            test_command_menu_invocation_help_quit)) ||
-      (NULL == CU_add_test(pSuite, "test menu launch (-N) << 'c testmenu.l a h 4 1 a h 5 3 a q'", 
+      (NULL == CU_add_test(pSuite, "test #2.42: menu launch (-N) loadfile+display+insert+display+insert+display+quit << 'c testmenu.l a h 4 1 a h 5 3 a q'", 
                            test_command_menu_invocation_load_insert_x_2_display_quit))
       )
     {
@@ -262,30 +275,43 @@ main(int argc, char** argv)
   CU_cleanup_registry();
   testres = CU_get_error();
 
+  /* Initialize the timespec structure for nanosleep */
   struct timespec ts_req, ts_rem;
-  ts_req.tv_sec = 5;
-  ts_req.tv_nsec = 0L;
+  // Wait 1s
+  ts_req.tv_sec = NUMBER_SECONDS_TO_WAIT;
+  // And wait half a second more
+  ts_req.tv_nsec = NUMBER_NANOSECONDS_TO_WAIT;
+  // Do wait ...
   if (nanosleep((const struct timespec*)&ts_req, &ts_rem) == -1)
     {
+      // If nanosleep was interrupted because of an error
       if (errno == EFAULT)
         {
+          // Report it
           perror("nanosleep");
           exit(1);
         }
+      // Else nanosleep was interrupted because of a signal or anything else
       else if (errno == EINTR)
+        // Let's loop in wait again
         do
           {
+            // If error occured
             if (errno == EFAULT)
               {
+                // Report it
                 perror("nanosleep loop");
                 exit(1);
               }
+            // Set the remaining time to wait (from ts_rem) as time to wait in ts_req
             ts_req.tv_sec = ts_rem.tv_sec;
             ts_req.tv_nsec = ts_rem.tv_nsec;
           }
+        // Then do wait again
         while(nanosleep((const struct timespec*)&ts_req, &ts_rem));
     }
-  
+
+  // Return the test main function
   return testres;
 }
 
