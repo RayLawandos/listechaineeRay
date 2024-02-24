@@ -19,11 +19,16 @@ set_target_properties(list
   PUBLIC_HEADER list/list.h)
 configure_file(list.pc.in list.pc @ONLY)
 target_include_directories(list PRIVATE "${PROJECT_SOURCE_DIR}")
-add_executable(listechainee src/listechainee_main.c)
+add_executable(listechainee src/listechainee_main.c src/log.c)
 include_directories(BEFORE "${PROJECT_SOURCE_DIR}")
 target_link_libraries(listechainee list)
-add_executable(testlistechainee tests/test-main.c tests/list-tests.c tests/cmd-tests.c tests/tests-results.c
-        tests/tests-results.h)
+add_executable(testlistechainee
+  src/log.c
+  tests/test-main.c
+  tests/list-tests.c
+  tests/cmd-tests.c
+  tests/tests-results.c
+  tests/tests-results.h)
 target_link_libraries(testlistechainee list -lcunit)
 add_test(testlistechainee testlistechainee)
 
