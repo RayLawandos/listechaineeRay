@@ -276,7 +276,7 @@ popen_dup_listechainee(int* fd_in, int* fd_out, int* fd_err, int nargs, ...)
 #define TEST_COMMAND_ARGS_VS_IO_RES_NB_FULL(nbin, nbout, nberr, fdin, fdout, fderr, nbargs, ...)    \
   pid_t childpid;                   /* Child process PID returned from fork */                      \
   int wstatus;                      /* Status returned by the child process */                      \
-  int fds[3];                       /* Status returned by the child process */                      \
+  int fds[3];                       /* File descr table used for getting in/out from child */       \
   char* total_out = (char*)NULL;    /* Buffer for all output from child standard output */          \
   char* total_err = (char*)NULL;    /* Buffer for all output from child standard error */           \
   ssize_t out_sz, total_out_sz = 0; /* Size of data read from child output and total size */        \
@@ -289,13 +289,10 @@ popen_dup_listechainee(int* fd_in, int* fd_out, int* fd_err, int nargs, ...)
   sprintf(expect_testname, "expected__%s.log", __PRETTY_FUNCTION__);                                \
                                                                                                     \
   /* Init IOs fds */                                                                                \
-  fds[0] = fds[1] = fds[2] = -1;                                                                    \
+  fds[STDIN_FILENO] = fds[STDOUT_FILENO] = fds[STDERR_FILENO] = -1;                                 \
                                                                                                     \
   /* Open the command with a pipe */                                                                \
-  childpid = popen_dup_listechainee(&fds[STDIN_FILENO],                                             \
-                                    &fds[STDOUT_FILENO],                                            \
-                                    (int*)NULL,                                                     \
-                                    nbargs, __VA_ARGS__);                                           \
+  childpid = popen_dup_listechainee(fdin, fdout, fderr, nbargs, __VA_ARGS__);                       \
                                                                                                     \
   /* Wait for child to terminate */                                                                 \
   (void)waitpid(childpid, &wstatus, WNOHANG);                                                       \
@@ -422,12 +419,12 @@ popen_dup_listechainee(int* fd_in, int* fd_out, int* fd_err, int nargs, ...)
   (void)waitpid(childpid, &wstatus, 0);
 
 /*
- * test_command_basic_invocation_0
+ * test_2_1_command_basic_invocation_0
  *
  * Basic tests for the command invocation without args
  */
 void
-test_command_basic_invocation_0(void)
+test_2_1_command_basic_invocation_0(void)
 {
   TEST_COMMAND_ARGS_VS_IO_RES_NB_FULL(-1, 0, 0,
                                       (int*)NULL, &fds[STDOUT_FILENO], &fds[STDERR_FILENO],
@@ -435,12 +432,12 @@ test_command_basic_invocation_0(void)
 }
 
 /*
- * test_command_basic_invocation_v
+ * test_2_2_command_basic_invocation_v
  *
  * Basic tests for the command invocation with '-v' arg
  */
 void
-test_command_basic_invocation_v(void)
+test_2_2_command_basic_invocation_v(void)
 {
   TEST_COMMAND_ARGS_VS_IO_RES_NB_FULL(-1, 1, 0,
                                       (int*)NULL, &fds[STDOUT_FILENO], &fds[STDERR_FILENO],
@@ -448,12 +445,12 @@ test_command_basic_invocation_v(void)
 }
 
 /*
- * test_command_basic_invocation_vh
+ * test_2_3_command_basic_invocation_vh
  *
  * Basic tests for the command invocation with '-v -h' args
  */
 void
-test_command_basic_invocation_vh(void)
+test_2_3_command_basic_invocation_vh(void)
 {
   TEST_COMMAND_ARGS_VS_IO_RES_NB_FULL(-1, 2, 0,
                                       (int*)NULL, &fds[STDOUT_FILENO], &fds[STDERR_FILENO],
@@ -461,12 +458,12 @@ test_command_basic_invocation_vh(void)
 }
 
 /*
- * test_command_basic_invocation_verbose
+ * test_2_4_command_basic_invocation_verbose
  *
  * Basic tests for the command invocation with '--verbose' arg
  */
 void
-test_command_basic_invocation_verbose(void)
+test_2_4_command_basic_invocation_verbose(void)
 {
   TEST_COMMAND_ARGS_VS_IO_RES_NB_FULL(-1, 3, 0,
                                       (int*)NULL, &fds[STDOUT_FILENO], &fds[STDERR_FILENO],
@@ -474,12 +471,12 @@ test_command_basic_invocation_verbose(void)
 }
 
 /*
- * test_command_basic_invocation_verbose_help
+ * test_2_5_command_basic_invocation_verbose_help
  *
  * Basic tests for the command invocation with '--verbose --help' args
  */
 void
-test_command_basic_invocation_verbose_help(void)
+test_2_5_command_basic_invocation_verbose_help(void)
 {
   TEST_COMMAND_ARGS_VS_IO_RES_NB_FULL(-1, 4, 0,
                                       (int*)NULL, &fds[STDOUT_FILENO], &fds[STDERR_FILENO],
@@ -487,144 +484,144 @@ test_command_basic_invocation_verbose_help(void)
 }
 
 /*
- * test_command_basic_invocation_A1d
+ * test_2_6_command_basic_invocation_A1d
  *
  * Basic tests for the command invocation with '-A 1 -d' args
  */
 void
-test_command_basic_invocation_A1d(void)
+test_2_6_command_basic_invocation_A1d(void)
 {
   TEST_COMMAND_ARGS_VS_RESULT_NB("-A 1 -d", 5);
 }
 
 /*
- * test_command_basic_invocation_P2d
+ * test_2_7_command_basic_invocation_P2d
  *
  * Basic tests for the command invocation with '-P 2 -d' args
  */
 void
-test_command_basic_invocation_P2d(void)
+test_2_7_command_basic_invocation_P2d(void)
 {
   TEST_COMMAND_ARGS_VS_RESULT_NB("-P 2 -d", 6);
 }
 
 /*
- * test_command_basic_invocation_append_3_display
+ * test_2_8_command_basic_invocation_append_3_display
  *
  * Basic tests for the command invocation with '--append 3 --display' args
  */
 void
-test_command_basic_invocation_append_3_display(void)
+test_2_8_command_basic_invocation_append_3_display(void)
 {
   TEST_COMMAND_ARGS_VS_RESULT_NB("--append 3 --display", 7);  
 }
 
 /*
- * test_command_basic_invocation_prepend_4_display
+ * test_2_9_command_basic_invocation_prepend_4_display
  *
  * Basic tests for the command invocation with '--prepend 4 --display' args
  */
 void
-test_command_basic_invocation_prepend_4_display(void)
+test_2_9_command_basic_invocation_prepend_4_display(void)
 {
   TEST_COMMAND_ARGS_VS_RESULT_NB("--prepend 4 --display", 8);  
 }
 
 /*
- * test_command_basic_invocation_A1P2d
+ * test_2_10_command_basic_invocation_A1P2d
  *
  * Basic tests for the command invocation with '-A 1 -P 2 -d' args
  */
 void
-test_command_basic_invocation_A1P2d(void)
+test_2_10_command_basic_invocation_A1P2d(void)
 {
   TEST_COMMAND_ARGS_VS_RESULT_NB("-A 1 -P 2 -d", 9);  
 }
 
 /*
- * test_command_basic_invocation_append_1_prepend_2_display
+ * test_2_11_command_basic_invocation_append_1_prepend_2_display
  *
  * Basic tests for the command invocation with '--append 1 --prepend 2 --display' args
  */
 void
-test_command_basic_invocation_append_1_prepend_2_display(void)
+test_2_11_command_basic_invocation_append_1_prepend_2_display(void)
 {
   TEST_COMMAND_ARGS_VS_RESULT_NB("--append 1 --prepend 2 --display", 10);  
 }
 
 /*
- * test_command_basic_invocation_vA1d
+ * test_2_12_command_basic_invocation_vA1d
  *
  * Basic tests for the command invocation with '-v -A 1 -d' args
  */
 void
-test_command_basic_invocation_vA1d(void)
+test_2_12_command_basic_invocation_vA1d(void)
 {
   TEST_COMMAND_ARGS_VS_RESULT_NB("-v -A 1 -d", 11);
 }
 
 /*
- * test_command_basic_invocation_vP2d
+ * test_2_13_command_basic_invocation_vP2d
  *
  * Basic tests for the command invocation with '-v -P 2 -d' args
  */
 void
-test_command_basic_invocation_vP2d(void)
+test_2_13_command_basic_invocation_vP2d(void)
 {
   TEST_COMMAND_ARGS_VS_RESULT_NB("-v -P 2 -d", 12);
 }
 
 /*
- * test_command_basic_invocation_verbose_append_3_display
+ * test_2_14_command_basic_invocation_verbose_append_3_display
  *
  * Basic tests for the command invocation with '--verbose --append 3 --display' args
  */
 void
-test_command_basic_invocation_verbose_append_3_display(void)
+test_2_14_command_basic_invocation_verbose_append_3_display(void)
 {
   TEST_COMMAND_ARGS_VS_RESULT_NB("--verbose --append 3 --display", 13);  
 }
 
 /*
- * test_command_basic_invocation_verbose_prepend_4_display
+ * test_2_15_command_basic_invocation_verbose_prepend_4_display
  *
  * Basic tests for the command invocation with '--verbose --prepend 4 --display' args
  */
 void
-test_command_basic_invocation_verbose_prepend_4_display(void)
+test_2_15_command_basic_invocation_verbose_prepend_4_display(void)
 {
   TEST_COMMAND_ARGS_VS_RESULT_NB("--verbose --prepend 4 --display", 14);  
 }
 
 /*
- * test_command_basic_invocation_vA1P2d
+ * test_2_16_command_basic_invocation_vA1P2d
  *
  * Basic tests for the command invocation with '-v -A 1 -P 2 -d' args
  */
 void
-test_command_basic_invocation_vA1P2d(void)
+test_2_16_command_basic_invocation_vA1P2d(void)
 {
   TEST_COMMAND_ARGS_VS_RESULT_NB("-v -A 1 -P 2 -d", 15);  
 }
 
 /*
- * test_command_basic_invocation_verbose_append_1_prepend_2_display
+ * test_2_17_command_basic_invocation_verbose_append_1_prepend_2_display
  *
  * Basic tests for the command invocation with '--verbose --append 1 --prepend 2 --display' args
  */
 void
-test_command_basic_invocation_verbose_append_1_prepend_2_display(void)
+test_2_17_command_basic_invocation_verbose_append_1_prepend_2_display(void)
 {
   TEST_COMMAND_ARGS_VS_RESULT_NB("--verbose --append 1 --prepend 2 --display", 16);  
 }
 
 /*
- * test_command_basic_invocation_vA1P2ds_testlist1_l
+ * test_2_18_command_basic_invocation_vA1P2ds_testlist1_l
  *
  * Basic tests for the command invocation with '-v -A 1 -P 2 -d -s testlist1.l' args
  */
 void
-test_command_basic_invocation_vA1P2ds_testlist1_l(void)
+test_2_18_command_basic_invocation_vA1P2ds_testlist1_l(void)
 {
   TEST_COMMAND_ARGS_VS_RESULT_NB("-v -A 1 -P 2 -d -s testlist1.l", 17);
   /* Open the saved list file */ 
@@ -652,12 +649,12 @@ test_command_basic_invocation_vA1P2ds_testlist1_l(void)
 }
 
 /*
- * test_command_basic_invocation_verbose_append_1_prepend_2_display_save_testlist1_l
+ * test_2_19_command_basic_invocation_verbose_append_1_prepend_2_display_save_testlist1_l
  *
  * Basic tests for the command invocation with '--verbose --append 1 --prepend 2 --display --save testlist1.l' args
  */
 void
-test_command_basic_invocation_verbose_append_1_prepend_2_display_save_testlist1_l(void)
+test_2_19_command_basic_invocation_verbose_append_1_prepend_2_display_save_testlist1_l(void)
 {
   TEST_COMMAND_ARGS_VS_RESULT_NB("--verbose --append 1 --prepend 2 --display --save testlist1.l", 18); 
   /* Open the saved list file */ 
@@ -685,34 +682,34 @@ test_command_basic_invocation_verbose_append_1_prepend_2_display_save_testlist1_
 }
 
 /*
- * test_command_basic_invocation_vl_testlist1_l_d
+ * test_2_20_command_basic_invocation_vl_testlist1_l_d
  *
  * Basic tests for the command invocation with '-v -l testlist1.l -d' args
  */
 void
-test_command_basic_invocation_vl_testlist1_l_d(void)
+test_2_20_command_basic_invocation_vl_testlist1_l_d(void)
 {
   TEST_COMMAND_ARGS_VS_RESULT_NB("-v -l testlist1.l -d", 19); 
 }
 
 /*
- * test_command_basic_invocation_verbose_load_testlist1_l_display
+ * test_2_21_command_basic_invocation_verbose_load_testlist1_l_display
  *
  * Basic tests for the command invocation with '--verbose --load testlist1.l --display' args
  */
 void
-test_command_basic_invocation_verbose_load_testlist1_l_display(void)
+test_2_21_command_basic_invocation_verbose_load_testlist1_l_display(void)
 {
   TEST_COMMAND_ARGS_VS_RESULT_NB("--verbose --load testlist1.l --display", 20); 
 }
 
 /*
- * test_command_basic_invocation_vl_testlist1_notfound_l_d
+ * test_2_22_command_basic_invocation_vl_testlist1_notfound_l_d
  *
  * Basic tests for the command invocation with '-v -l testlist1-notfound.l -d' args
  */
 void
-test_command_basic_invocation_vl_testlist1_notfound_l_d(void)
+test_2_22_command_basic_invocation_vl_testlist1_notfound_l_d(void)
 {
   TEST_COMMAND_ARGS_VS_IO_RES_NB_FULL(-1, 21, 1,
                                       (int*)NULL, &fds[STDOUT_FILENO], &fds[STDERR_FILENO],
@@ -720,12 +717,12 @@ test_command_basic_invocation_vl_testlist1_notfound_l_d(void)
 }
 
 /*
- * test_command_basic_invocation_verbose_load_testlist1_notfound_l_display
+ * test_2_23_command_basic_invocation_verbose_load_testlist1_notfound_l_display
  *
  * Basic tests for the command invocation with '--verbose --load testlist1-notfound.l --display' args
  */
 void
-test_command_basic_invocation_verbose_load_testlist1_notfound_l_display(void)
+test_2_23_command_basic_invocation_verbose_load_testlist1_notfound_l_display(void)
 {
   TEST_COMMAND_ARGS_VS_IO_RES_NB_FULL(-1, 22, 2,
                                       (int*)NULL, &fds[STDOUT_FILENO], &fds[STDERR_FILENO],
@@ -733,199 +730,199 @@ test_command_basic_invocation_verbose_load_testlist1_notfound_l_display(void)
 }
 
 /*
- * test_command_basic_invocation_A1A2A3dr1dP4dr2dr4dr3dr3d
+ * test_2_24_command_basic_invocation_A1A2A3dr1dP4dr2dr4dr3dr3d
  *
  * Basic tests for the command invocation with '-A 1 -A 2 -A 3 -d -r 1 -d -P 4 -d -r 2 -d -r 4 -d -r 3 -d -r 3 -d' args
  */
 void
-test_command_basic_invocation_A1A2A3dr1dP4dr2dr4dr3dr3d(void)
+test_2_24_command_basic_invocation_A1A2A3dr1dP4dr2dr4dr3dr3d(void)
 {
   TEST_COMMAND_ARGS_VS_RESULT_NB("-A 1 -A 2 -A 3 -d -r 1 -d -P 4 -d -r 2 -d -r 4 -d -r 3 -d -r 3 -d", 23); 
 }
 
 /*
- * test_command_basic_invocation_A1A2A3dI41d
+ * test_2_25_command_basic_invocation_A1A2A3dI41d
  *
  * Basic tests for the command invocation with '-A 1 -A 2 -A 3 -d -I 4,1 -d' args
  */
 void
-test_command_basic_invocation_A1A2A3dI41d(void)
+test_2_25_command_basic_invocation_A1A2A3dI41d(void)
 {
   TEST_COMMAND_ARGS_VS_RESULT_NB("-A 1 -A 2 -A 3 -d -I4,1 -d", 24); 
 }
 
 /*
- * test_command_basic_invocation_A1A2A3dI42d
+ * test_2_26_command_basic_invocation_A1A2A3dI42d
  *
  * Basic tests for the command invocation with '-A 1 -A 2 -A 3 -d -I 4,2 -d' args
  */
 void
-test_command_basic_invocation_A1A2A3dI42d(void)
+test_2_26_command_basic_invocation_A1A2A3dI42d(void)
 {
   TEST_COMMAND_ARGS_VS_RESULT_NB("-A 1 -A 2 -A 3 -d -I4,2 -d", 25); 
 }
 
 /*
- * test_command_basic_invocation_A1A2A3dI43d
+ * test_2_27_command_basic_invocation_A1A2A3dI43d
  *
  * Basic tests for the command invocation with '-A 1 -A 2 -A 3 -d -I 4,3 -d' args
  */
 void
-test_command_basic_invocation_A1A2A3dI43d(void)
+test_2_27_command_basic_invocation_A1A2A3dI43d(void)
 {
   TEST_COMMAND_ARGS_VS_RESULT_NB("-A 1 -A 2 -A 3 -d -I4,3 -d", 26); 
 }
 
 /*
- * test_command_basic_invocation_A1A2A3dI44d
+ * test_2_28_command_basic_invocation_A1A2A3dI44d
  *
  * Basic tests for the command invocation with '-A 1 -A 2 -A 3 -d -I 4,4 -d' args
  */
 void
-test_command_basic_invocation_A1A2A3dI44d(void)
+test_2_28_command_basic_invocation_A1A2A3dI44d(void)
 {
   TEST_COMMAND_ARGS_VS_RESULT_NB("-A 1 -A 2 -A 3 -d -I4,4 -d", 27); 
 }
 
 /*
- * test_command_basic_invocation_A1A2A3dI12d
+ * test_2_29_command_basic_invocation_A1A2A3dI12d
  *
  * Basic tests for the command invocation with '-A 1 -A 2 -A 3 -d -I 1,2 -d' args
  */
 void
-test_command_basic_invocation_A1A2A3dI12d(void)
+test_2_29_command_basic_invocation_A1A2A3dI12d(void)
 {
   TEST_COMMAND_ARGS_VS_RESULT_NB("-A 1 -A 2 -A 3 -d -I1,2 -d", 28); 
 }
 
 /*
- * test_command_basic_invocation_A1A2A3dI4plus0d
+ * test_2_30_command_basic_invocation_A1A2A3dI4plus0d
  *
  * Basic tests for the command invocation with '-A 1 -A 2 -A 3 -d -I 4,+0 -d' args
  */
 void
-test_command_basic_invocation_A1A2A3dI4plus0d(void)
+test_2_30_command_basic_invocation_A1A2A3dI4plus0d(void)
 {
   TEST_COMMAND_ARGS_VS_RESULT_NB("-A 1 -A 2 -A 3 -d -I4,+0 -d", 29); 
 }
 
 /*
- * test_command_basic_invocation_A1A2A3dI4plus1d
+ * test_2_31_command_basic_invocation_A1A2A3dI4plus1d
  *
  * Basic tests for the command invocation with '-A 1 -A 2 -A 3 -d -I 4,+1 -d' args
  */
 void
-test_command_basic_invocation_A1A2A3dI4plus1d(void)
+test_2_31_command_basic_invocation_A1A2A3dI4plus1d(void)
 {
   TEST_COMMAND_ARGS_VS_RESULT_NB("-A 1 -A 2 -A 3 -d -I4,+1 -d", 30); 
 }
 
 /*
- * test_command_basic_invocation_A1A2A3dI4plus2d
+ * test_2_32_command_basic_invocation_A1A2A3dI4plus2d
  *
  * Basic tests for the command invocation with '-A 1 -A 2 -A 3 -d -I 4,+2 -d' args
  */
 void
-test_command_basic_invocation_A1A2A3dI4plus2d(void)
+test_2_32_command_basic_invocation_A1A2A3dI4plus2d(void)
 {
   TEST_COMMAND_ARGS_VS_RESULT_NB("-A 1 -A 2 -A 3 -d -I4,+2 -d", 31); 
 }
 
 /*
- * test_command_basic_invocation_A1A2A3dI4plus3d
+ * test_2_33_command_basic_invocation_A1A2A3dI4plus3d
  *
  * Basic tests for the command invocation with '-A 1 -A 2 -A 3 -d -I 4,+3 -d' args
  */
 void
-test_command_basic_invocation_A1A2A3dI4plus3d(void)
+test_2_33_command_basic_invocation_A1A2A3dI4plus3d(void)
 {
   TEST_COMMAND_ARGS_VS_RESULT_NB("-A 1 -A 2 -A 3 -d -I4,+3 -d", 32); 
 }
 /*
- * test_command_basic_invocation_A1A2A3dI1plus0d
+ * test_2_34_command_basic_invocation_A1A2A3dI1plus0d
  *
  * Basic tests for the command invocation with '-A 1 -A 2 -A 3 -d -I 1,+0 -d' args
  */
 void
-test_command_basic_invocation_A1A2A3dI1plus0d(void)
+test_2_34_command_basic_invocation_A1A2A3dI1plus0d(void)
 {
   TEST_COMMAND_ARGS_VS_RESULT_NB("-A 1 -A 2 -A 3 -d -I1,+0 -d", 33); 
 }
 
 /*
- * test_command_basic_invocation_l_testlist1_l_dt1t2t3
+ * test_2_35_command_basic_invocation_l_testlist1_l_dt1t2t3
  *
  * Basic tests for the command invocation with '-l testlist1.l -d -t 1 -t 2 -t 3' args
  */
 void
-test_command_basic_invocation_l_testlist1_l_dt1t2t3(void)
+test_2_35_command_basic_invocation_l_testlist1_l_dt1t2t3(void)
 {
   TEST_COMMAND_ARGS_VS_RESULT_NB("-l testlist1.l -d -t 1 -t 2 -t 3", 34); 
 }
 
 /*
- * test_command_basic_invocation_vl_testlist1_l_dt1t2t3
+ * test_2_36_command_basic_invocation_vl_testlist1_l_dt1t2t3
  *
  * Basic tests for the command invocation with '-v -l testlist1.l -d -t 1 -t 2 -t 3' args
  */
 void
-test_command_basic_invocation_vl_testlist1_l_dt1t2t3(void)
+test_2_36_command_basic_invocation_vl_testlist1_l_dt1t2t3(void)
 {
   TEST_COMMAND_ARGS_VS_RESULT_NB("-v -l testlist1.l -d -t 1 -t 2 -t 3", 35); 
 }
 
 /*
- * test_command_basic_invocation_l_testlist1_l_A1dr2d
+ * test_2_37_command_basic_invocation_l_testlist1_l_A1dr2d
  *
  * Basic tests for the command invocation with '-l testlist1.l -A 3 -d -r 2 -d' args
  */
 void
-test_command_basic_invocation_l_testlist1_l_A1dr2d(void)
+test_2_37_command_basic_invocation_l_testlist1_l_A1dr2d(void)
 {
   TEST_COMMAND_ARGS_VS_RESULT_NB("-l testlist1.l -A 3 -d -r 2 -d", 36);
 }
 
 /*
- * test_command_basic_invocation_l_testlist1_l_A1dr1d
+ * test_2_38_command_basic_invocation_l_testlist1_l_A1dr1d
  *
  * Basic tests for the command invocation with '-l testlist1.l -A 3 -d -r 1 -d' args
  */
 void
-test_command_basic_invocation_l_testlist1_l_A1dr1d(void)
+test_2_38_command_basic_invocation_l_testlist1_l_A1dr1d(void)
 {
   TEST_COMMAND_ARGS_VS_RESULT_NB("-l testlist1.l -A 3 -d -r 1 -d", 37);
 }
 
 /*
- * test_command_basic_invocation_l_testlist1_l_A1dr3d
+ * test_2_39_command_basic_invocation_l_testlist1_l_A1dr3d
  *
  * Basic tests for the command invocation with '-l testlist1.l -A 3 -d -r 3 -d' args
  */
 void
-test_command_basic_invocation_l_testlist1_l_A1dr3d(void)
+test_2_39_command_basic_invocation_l_testlist1_l_A1dr3d(void)
 {
   TEST_COMMAND_ARGS_VS_RESULT_NB("-l testlist1.l -A 3 -d -r 3 -d", 38);
 }
 
 /*
- * test_command_basic_invocation_l_testlist1_l_A1dr4d
+ * test_2_40_command_basic_invocation_l_testlist1_l_A1dr4d
  *
  * Basic tests for the command invocation with '-l testlist1.l -A 3 -d -r 4 -d' args
  */
 void
-test_command_basic_invocation_l_testlist1_l_A1dr4d(void)
+test_2_40_command_basic_invocation_l_testlist1_l_A1dr4d(void)
 {
   TEST_COMMAND_ARGS_VS_RESULT_NB("-l testlist1.l -A 3 -d -r 4 -d", 39);
 }
 
 /*
- * test_command_menu_invocation_append_display
+ * test_2_41_command_menu_invocation_append_display
  *
  * Basic tests for the command menu invocation with '-N' args
  * then send 'f \n 1 \n f \n 2 \n a \n q \n' on standard input
  */
 void
-test_command_menu_invocation_append_display(void)
+test_2_41_command_menu_invocation_append_display(void)
 {
   TEST_COMMAND_ARGS_VS_IO_RES_NB_FULL(0, 40, -1,
                                       &fds[STDIN_FILENO], &fds[STDOUT_FILENO], (int*)NULL,
@@ -933,13 +930,13 @@ test_command_menu_invocation_append_display(void)
 }
 
 /*
- * test_command_menu_invocation_help_quit
+ * test_2_42_command_menu_invocation_help_quit
  *
  * Basic tests for the command menu invocation with '-N' args
  * then send 'm \n q \n' on standard input
  */
 void
-test_command_menu_invocation_help_quit(void)
+test_2_42_command_menu_invocation_help_quit(void)
 {
   TEST_COMMAND_ARGS_VS_IO_RES_NB_FULL(1, 41, -1,
                                       &fds[STDIN_FILENO], &fds[STDOUT_FILENO], (int*)NULL,
@@ -947,13 +944,13 @@ test_command_menu_invocation_help_quit(void)
 }
 
 /*
- * test_command_menu_invocation_load_insert_x_2_display_quit
+ * test_2_43_command_menu_invocation_load_insert_x_2_display_quit
  *
  * Basic tests for the command menu invocation with '-N' args
  * then send 'c \n testmenu.l \n a \n h \n 4 \n 1 \n a \n h \n 5 \n 3 \n a \n q \n' on standard input
  */
 void
-test_command_menu_invocation_load_insert_x_2_display_quit(void)
+test_2_43_command_menu_invocation_load_insert_x_2_display_quit(void)
 {
   TEST_COMMAND_ARGS_VS_IO_RES_NB_FULL(1, 41, -1,
                                       &fds[STDIN_FILENO], &fds[STDOUT_FILENO], (int*)NULL,
