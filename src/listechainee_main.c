@@ -12,12 +12,17 @@
 #include <stdlib.h>
 #include <getopt.h>
 
-#include "list/list.h"
+#include "src/log.h"					// Include logging header
+#include "list/list.h"					// Include list header
 
+// Message maximum size
 #define ERR_MESSAGE_MAX_SIZE    1024
 
+// Global env vars pointer
+char** global_envp = (char**)NULL;
+
 /* Forward decl main */
-int main(int argc, char** argv);
+int main(int, char**, char**);
 
 /* Long options specification: see 'man 3 getopt' */
 static struct option long_options[] =
@@ -328,12 +333,15 @@ enter_interactive_mode(listechainee_ptr list)
  * The main function being the program entry point
  */
 int
-main(int argc, char** argv)
+main(int argc, char** argv, char** envp)
 {
   /* The variable holding the command line argument */
   int c;
   /* Option index digit */
   int digit_optind = 0;
+
+  /* Save env vars ptr in global var */
+  global_envp = envp;
 
   /* Extract the program name from the first argument */
   progname = (progname = rindex(argv[0], '/')) ? progname+1 : argv[0];
