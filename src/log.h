@@ -23,7 +23,7 @@ extern const char * const sys_errlist[];
 
 // Logging macro
 #ifdef    DEBUG
-#define LOG(logfmt, ...)	do_log(logfp, loglvl, logfmt, ...)
+#define LOG(loglvl, logfmt, ...)	{if (loglvl >= log_lvl) do_log(logfp, loglvl, logfmt, ...);}
 #else  /* !DEBUG */
 #define LOG(logfmt, ...)	/* Do nothing ... */
 #endif /* !DEBUG */
@@ -39,10 +39,10 @@ enum loglvl_e {
 typedef enum loglvl_e loglvl_t;
 
 /* File pointer for log file */
-FILE* logfp = (FILE*)NULL;
+extern FILE* logfp;
 
 /* Level of logging */
-loglvl_t loglvl = LOG_LVL_INFO;
+extern loglvl_t loglvl;
 
 /*
  * Forward decl for logging functions
