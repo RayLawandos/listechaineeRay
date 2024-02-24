@@ -22,11 +22,11 @@ extern const char * const sys_errlist[];
 #define MAX_LOG_MSG_LENGTH 1024
 
 // Logging macro
-#ifdef    DEBUG
-#define LOG(loglvl, logfmt, ...)	{if (loglvl >= log_lvl) do_log(logfp, loglvl, logfmt, ...);}
-#else  /* !DEBUG */
-#define LOG(logfmt, ...)	/* Do nothing ... */
-#endif /* !DEBUG */
+#ifdef     DO_LOG
+#define LOG(log_lvl, logfmt, ...)	{if (loglvl >= log_lvl) do_log(logfp, loglvl, logfmt, __VA_ARGS__);}
+#else  /* !DO_LOG */
+#define LOG(log_lvl, logfmt, ...)	/* Do nothing ... */
+#endif /* !DO_LOG */
 
 /* Enum for logging levels */
 enum loglvl_e {

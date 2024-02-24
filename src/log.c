@@ -63,7 +63,7 @@ do_log(FILE* logfp, loglvl_t loglvl, char* logfmt, ...)
   if (logptr)
     {
       // Continue parsing logfmt with current sep
-      while(logptr = strtok((char*)NULL, " \"'|(),:;\n\t"))
+      while(logptr = strtok((char*)NULL, "! \"'|()[],:;\n\t"))
         {
           // According to the '%' char requested
           switch (logptr[strlen(logptr)-1])
@@ -138,7 +138,7 @@ do_log(FILE* logfp, loglvl_t loglvl, char* logfmt, ...)
 
               // We do not know the requested field
             default:
-              fprintf(stderr, "** unknown argument type in log format string !!\n");
+              
             }
         }
     }
