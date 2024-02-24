@@ -11,6 +11,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <getopt.h>
+#include <time.h>
 
 #include "src/log.h"					// Include logging header
 #include "list/list.h"					// Include list header
@@ -349,6 +350,25 @@ main(int argc, char** argv, char** envp)
   blankname = strndup(progname, strlen(progname));
   /* Actually convert the program name into blank string */
   blankname = memset(blankname, (int)' ', strlen(progname));
+  
+  /* Get current date */
+  time_t current_time = time((time_t*)NULL);
+  char* datestr = ctime(&current_time);
+  datestr[strlen(datestr)-1] = '\0';
+  char* date_tmp = datestr;
+  while(*date_tmp)
+    {
+      if (*date_tmp == ' ')
+        *date_tmp = '_';
+      date_tmp++;
+    }
+  
+  /* Init logging */
+  char logfilepath[1024];
+  snprintf(logfilepath, 1024, "%s_%s.log", progname, datestr);
+  loglvl = LOG_LVL_INFO;
+  logfp = init_log(logfilepath, loglvl);
+
   /* Initialize the linked list */ 
   init_list();
 
@@ -377,6 +397,7 @@ main(int argc, char** argv, char** envp)
         h_opt = 1;
         if (v_opt)
           fprintf(stdout, "%s: info: option 'h' was set !\n", progname);
+        LOG(LOG_LVL_INFO, "%s: info: option 'h' was set !\n", progname);
         break;
 
         /**
@@ -386,6 +407,7 @@ main(int argc, char** argv, char** envp)
         v_opt++;
         if (v_opt)
           fprintf(stdout, "%s: info: option 'v' was incremented for verbosity !\n", progname);
+        LOG(LOG_LVL_INFO, "%s: info: option 'v' was incremented for verbosity !\n", progname);
         break;
 
         /**
@@ -395,6 +417,7 @@ main(int argc, char** argv, char** envp)
         d_opt = 1;
         if (v_opt)
           fprintf(stdout, "%s: info: option 'd' was set !\n", progname);
+        LOG(LOG_LVL_INFO, "%s: info: option 'd' was set !\n", progname);
         break;
 
         /**
@@ -404,6 +427,7 @@ main(int argc, char** argv, char** envp)
         i_opt = 1;
         if (v_opt)
           fprintf(stdout, "%s: info: option 'i' was set !\n", progname);
+        LOG(LOG_LVL_INFO, "%s: info: option 'i' was set !\n", progname);
         break;
 
         /**
@@ -414,6 +438,7 @@ main(int argc, char** argv, char** envp)
         arg_filename = optarg;
         if (v_opt)
           fprintf(stdout, "%s: info: option 'l' was called for file '%s' !\n", progname, arg_filename);
+        LOG(LOG_LVL_INFO, "%s: info: option 'l' was called for file '%s' !\n", progname, arg_filename);
         break;
 
         /**
@@ -695,6 +720,8 @@ main(int argc, char** argv, char** envp)
         }
     }
 
+  end_log(logfp);
+  
   return 0;
 }
 
