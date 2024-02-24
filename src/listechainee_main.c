@@ -367,7 +367,9 @@ main(int argc, char** argv, char** envp)
   char logfilepath[1024];
   snprintf(logfilepath, 1024, "%s_%s.log", progname, datestr);
   loglvl = LOG_LVL_INFO;
+#ifdef DO_LOG
   logfp = init_log(logfilepath, loglvl);
+#endif /* DO_LOG */
 
   /* Initialize the linked list */ 
   init_list();
@@ -449,6 +451,7 @@ main(int argc, char** argv, char** envp)
         arg_filename = optarg;
         if (v_opt)
           fprintf(stdout, "%s: info: option 's' was called for file '%s' !\n", progname, arg_filename);
+        LOG(LOG_LVL_INFO, "%s: info: option 's' was called for file '%s' !\n", progname, arg_filename);
         break;
 
         /**
@@ -459,6 +462,7 @@ main(int argc, char** argv, char** envp)
         arg_elem = atoi(optarg);
         if (v_opt)
           fprintf(stdout, "%s: info: option 't' was called for elem '%d' !\n", progname, arg_elem);
+        LOG(LOG_LVL_INFO, "%s: info: option 't' was called for elem '%d' !\n", progname, arg_elem);
         break;
 
         /**
@@ -469,6 +473,7 @@ main(int argc, char** argv, char** envp)
         arg_elem = atoi(optarg);
         if (v_opt)
           fprintf(stdout, "%s: info: option 'A' was called for appending '%d' !\n", progname, arg_elem);
+        LOG(LOG_LVL_INFO, "%s: info: option 'A' was called for appending '%d' !\n", progname, arg_elem);
         break;
 
         /**
@@ -479,6 +484,7 @@ main(int argc, char** argv, char** envp)
         arg_elem = atoi(optarg);
         if (v_opt)
           fprintf(stdout, "%s: info: option 'P' was called for prepending '%d' !\n", progname, arg_elem);
+        LOG(LOG_LVL_INFO, "%s: info: option 'P' was called for prepending '%d' !\n", progname, arg_elem);
         break;
 
         /**
@@ -499,6 +505,7 @@ main(int argc, char** argv, char** envp)
             }
           if (v_opt)
             fprintf(stdout, "%s: info: option 'I' was called with elem '%d' and index '%d' !\n", progname, arg_elem, arg_index);
+          LOG(LOG_LVL_INFO, "%s: info: option 'I' was called with elem '%d' and index '%d' !\n", progname, arg_elem, arg_index);
         }
         break;
 
@@ -509,6 +516,7 @@ main(int argc, char** argv, char** envp)
         x_opt = 1;
         if (v_opt)
           fprintf(stdout, "%s: info: option 'x' was set !\n", progname);
+        LOG(LOG_LVL_INFO, "%s: info: option 'x' was set !\n", progname);
         break;
 
         /**
@@ -518,6 +526,7 @@ main(int argc, char** argv, char** envp)
         X_opt = 1;
         if (v_opt)
           fprintf(stdout, "%s: info: option 'X' was set !\n", progname);
+        LOG(LOG_LVL_INFO, "%s: info: option 'X' was set !\n", progname);
         break;
 
         /**
@@ -528,18 +537,21 @@ main(int argc, char** argv, char** envp)
         arg_elem = atoi(optarg);
         if (v_opt)
           fprintf(stdout, "%s: info: option 'r' was called with elem '%d' !\n", progname, arg_elem);
+        LOG(LOG_LVL_INFO, "%s: info: option 'r' was called with elem '%d' !\n", progname, arg_elem);
         break;
 
       case 'q':
         q_opt = 1;
         if (v_opt)
           fprintf(stdout, "%s: info: option 'q' was set !\n", progname);
+        LOG(LOG_LVL_INFO, "%s: info: option 'q' was set !\n", progname);
         break;
 
       case 'N':
         N_opt = 1;
         if (v_opt)
           fprintf(stdout, "%s: info: option 'N' was set ! Entering interactive menu ...\n", progname);
+        LOG(LOG_LVL_INFO, "%s: info: option 'N' was set ! Entering interactive menu ...\n", progname);
         break;
 
       case '?':
@@ -547,6 +559,7 @@ main(int argc, char** argv, char** envp)
 
       default:
         fprintf(stderr, "?? getopt returned character code 0%o ??\n", c);
+        LOG(LOG_LVL_ERR, "?? getopt returned character code 0%o ??\n", c);
 
       }
     
@@ -556,6 +569,11 @@ main(int argc, char** argv, char** envp)
               progname, curlist,
               curlist ? curlist->N: 0,
               (void*)(curlist ? curlist->next : NULL));
+    LOG(LOG_LVL_INFO,
+        "%s: info: curlist = %p [%d, %p]\n",
+        progname, curlist,
+        curlist ? curlist->N: 0,
+        (void*)(curlist ? curlist->next : NULL));
 
     /*
      * Now,
@@ -568,6 +586,7 @@ main(int argc, char** argv, char** envp)
         one_opt = 1;
         if (v_opt)
           fprintf(stdout, "%s: info: appending '%d'\n", progname, arg_elem);
+        LOG(LOG_LVL_INFO, "%s: info: appending '%d'\n", progname, arg_elem);
         A_opt = 0;
         listechainee_ptr tmplist = append_list(curlist, arg_elem);
         if (tmplist == NULL)
@@ -581,6 +600,7 @@ main(int argc, char** argv, char** envp)
         one_opt = 1;
         if (v_opt)
           fprintf(stdout, "%s: info: prepending '%d'\n", progname, arg_elem);
+        LOG(LOG_LVL_INFO, "%s: info: prepending '%d'\n", progname, arg_elem);
         P_opt = 0;
         listechainee_ptr tmplist = prepend_list(curlist, arg_elem);
         if (tmplist == NULL)
@@ -594,6 +614,7 @@ main(int argc, char** argv, char** envp)
         one_opt = 1;
         if (v_opt)
           fprintf(stdout, "%s: info: Displaying list\n", progname);
+        LOG(LOG_LVL_INFO, "%s: info: Displaying list\n", progname);
         d_opt = 0;
         display_list(curlist);
       }
@@ -603,6 +624,7 @@ main(int argc, char** argv, char** envp)
         one_opt = 1;
         if (v_opt)
           fprintf(stdout, "%s: info: Deleting element at %s of list\n", progname, x_opt ? "start" : "end");
+        LOG(LOG_LVL_INFO, "%s: info: Deleting element at %s of list\n", progname, x_opt ? "start" : "end");
         curlist = x_opt ? delete_start_of_list(curlist) : delete_end_of_list(curlist);
         x_opt = X_opt = 0;
       }
@@ -611,6 +633,7 @@ main(int argc, char** argv, char** envp)
         one_opt = 1;        
         if (v_opt)
           fprintf(stdout, "%s: info: Initializing current list !\n", progname);
+        LOG(LOG_LVL_INFO, "%s: info: Initializing current list !\n", progname);
         init_list();
       }
     else if (l_opt || s_opt)  /* Load/Save list from/to file */
@@ -619,6 +642,7 @@ main(int argc, char** argv, char** envp)
         one_opt = 1;
         if (v_opt)
           fprintf(stdout, "%s: info: Loading/Saving from/to filename '%s'\n", progname, arg_filename);
+        LOG(LOG_LVL_INFO, "%s: info: Loading/Saving from/to filename '%s'\n", progname, arg_filename);
         /* Load command */
         if (l_opt)
           {
@@ -637,6 +661,7 @@ main(int argc, char** argv, char** envp)
             else
               if (v_opt)
                 fprintf(stdout, "%s: info: list was successfully loaded from file '%s'\n", progname, arg_filename);
+            LOG(LOG_LVL_INFO, "%s: info: list was successfully loaded from file '%s'\n", progname, arg_filename);
           }
         /* Save command */
         else if (s_opt)
@@ -654,6 +679,7 @@ main(int argc, char** argv, char** envp)
             else
               if (v_opt)
                 fprintf(stdout, "%s: info: list was successfully saved to file '%s'\n", progname, arg_filename);
+            LOG(LOG_LVL_INFO, "%s: info: list was successfully saved to file '%s'\n", progname, arg_filename);
           }
         l_opt = s_opt = 0;
       }
@@ -665,13 +691,16 @@ main(int argc, char** argv, char** envp)
         arg_elem = atoi(optarg);
         if (v_opt)
           fprintf(stdout, "%s: info: testing if element '%d' is in the list\n", progname, arg_elem);
+        LOG(LOG_LVL_INFO, "%s: info: testing if element '%d' is in the list\n", progname, arg_elem);
         fprintf(stdout, "Element '%d' is%s in the list.\n", arg_elem, test_elem_in_list(curlist, arg_elem) ? "" : " not");
+        LOG(LOG_LVL_INFO, "Element '%d' is%s in the list.\n", arg_elem, test_elem_in_list(curlist, arg_elem) ? "" : " not");
         t_opt = 0;
       }
     else if (I_opt) /* Insert element in list */
       {
         if (v_opt)
           fprintf(stdout, "%s: info: inserting element '%d' in the list at index '%d'\n", progname, arg_elem, arg_index);
+        LOG(LOG_LVL_INFO, "%s: info: inserting element '%d' in the list at index '%d'\n", progname, arg_elem, arg_index);
         curlist = insert_elem_in_list(curlist, arg_index, arg_elem);        
         I_opt = 0;
       }
@@ -681,6 +710,7 @@ main(int argc, char** argv, char** envp)
         one_opt = 1;        
         if (v_opt)
           fprintf(stdout, "%s: info: removing element '%d' from list\n", progname, arg_elem);
+        LOG(LOG_LVL_INFO, "%s: info: removing element '%d' from list\n", progname, arg_elem);
         curlist = delete_elem_in_list(curlist, arg_elem);
         r_opt = 0;
       }
@@ -699,6 +729,7 @@ main(int argc, char** argv, char** envp)
     {
       /* Error ... */
       fprintf(stderr, "%s: error: no option was specified!\n", progname);
+      LOG(LOG_LVL_ERR, "%s: error: no option was specified!\n", progname);
       print_help();
     }
   else
@@ -720,7 +751,9 @@ main(int argc, char** argv, char** envp)
         }
     }
 
+#ifdef DO_LOG
   end_log(logfp);
+#endif /* DO_LOG */
   
   return 0;
 }
