@@ -23,9 +23,18 @@
 /* Define FALSE */
 #define FALSE (1 == 0)
 
+/*
+ * Global env var ptr
+ */
+extern char** global_envp;
+
+/*
+ * Liste chainee struct def
+ */
 typedef struct listechainee_st *listechainee_ptr;
 
-struct listechainee_st {
+struct listechainee_st
+{
   int N;
   listechainee_ptr next;
 };
