@@ -6,6 +6,10 @@
 
 #pragma once
 
+#include <unistd.h>
+#include <limits.h>
+#include <linux/limits.h>
+
 /*
  * Command pathnames
  */
@@ -21,14 +25,14 @@
 extern const char const* command_pathname;
 
 /* Constants */
-#define BUFFER_MAX_SIZE             4096
+#define BUFFER_MAX_SIZE             PIPE_BUF
 #define ERROR_BUFFER_SIZE           1024
 #define LIST_BUFFER_SIZE            1024
 #define MESSAGE_MAX_SIZE            1024
 
 /* Numbering for pipe ends (reading, writing) */
-#define PIPE_READ_END               0
-#define PIPE_WRITE_END              1
+#define PIPE_READ_END               STDIN_FILENO
+#define PIPE_WRITE_END              STDOUT_FILENO
 
 /*
  * Declarations for command test functions

@@ -14,7 +14,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
 #include <stdarg.h>
 #include <fcntl.h> 
 #include <errno.h>
@@ -135,19 +134,19 @@ popen_dup_listechainee(int* fd_in, int* fd_out, int* fd_err, int nargs, ...)
    * Create our three pipes: input, output and error
    */
   if (use_input_fd)
-    if (pipe2(fdin, O_NONBLOCK) == -1) 	/* One for standard input */
+    if (pipe2(fdin, O_CLOEXEC|O_NONBLOCK|O_DIRECT) == -1) 	/* One for standard input */
       {
         perror("create input pipe");
         return -1;          
       }
   if (use_output_fd)
-    if (pipe2(fdout, 0) == -1)  		/* One for standard output */ 
+    if (pipe2(fdout, O_CLOEXEC|O_DIRECT) == -1)  		/* One for standard output */ 
       {
         perror("create output pipe");
         return -1;          
       }
   if (use_error_fd)
-    if (pipe2(fderr, 0) == -1)  /* One for standard error */
+    if (pipe2(fderr, O_CLOEXEC|O_DIRECT) == -1)  /* One for standard error */
       {
         perror("create error pipe");
         return -1;          
